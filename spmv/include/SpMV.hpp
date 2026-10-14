@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace SpMV
 {
     class SparseMatrix
@@ -17,19 +19,20 @@ namespace SpMV
         ~SparseMatrix();
     };
 
-    SparseMatrix::SparseMatrix(int nrows, int ncols)
+    SparseMatrix::SparseMatrix(int nrows, int ncols) :
+        _nrows(nrows), _ncols(ncols)
     {
-        std::cout << "Hello from SparseMatrix Constructor!" << std::endl;
+        cout << "Hello from SparseMatrix Constructor!" << endl;
         this->_nrows = nrows;
         this->_ncols = ncols;
     }
 
     SparseMatrix::~SparseMatrix()
     {
-        std::cout << "Hello from SparseMatrix Destructor!" << std::endl;
-        std::cout << "this->_nrows=" << this->_nrows << std::endl;
-        std::cout << "this->_ncols=" << this->_ncols << std::endl;
-        std::cout << "this->_numnz=" << this->_numnz << std::endl;
+        cout << "Hello from SparseMatrix Destructor!" << endl;
+        cout << "this->_nrows=" << this->_nrows << endl;
+        cout << "this->_ncols=" << this->_ncols << endl;
+        cout << "this->_numnz=" << this->_numnz << endl;
     }
 }
 
