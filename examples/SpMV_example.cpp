@@ -5,13 +5,13 @@ int main(/* int argc, char* argv[] */)
 {
     std::cout << "Hello World!" << std::endl;
 
-    SpMV::SparseMatrix* ptr_A = new SpMV::SparseMatrix(20,20);
+    SpMV::SparseMatrix<float>* ptr_A = new SpMV::SparseMatrix<float>(20,20);
 
     ptr_A->setValue(0,0,0.0);
 
     // New scoping unit. This means variables defined in here, stay here.
     {
-        SpMV::SparseMatrix A = SpMV::SparseMatrix(10000,10);
+        SpMV::SparseMatrix<double> A = SpMV::SparseMatrix<double>(10000,10);
         std::cout << "Lets do stuff to A!" << std::endl;
         double a = A.getValue(0,0);
         std::cout << "a(0,0)=" << a << std::endl;
