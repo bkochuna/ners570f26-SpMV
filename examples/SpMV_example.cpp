@@ -9,7 +9,7 @@ int main(/* int argc, char* argv[] */)
 
     // New scoping unit. This means variables defined in here, stay here.
     {
-        SpMV::SparseMatrix A = SpMV::SparseMatrix(10000,-10);
+        SpMV::SparseMatrix A = SpMV::SparseMatrix(10000,10);
         std::cout << "Lets do stuff to A!" << std::endl;
     }
 
