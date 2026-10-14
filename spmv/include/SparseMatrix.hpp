@@ -17,6 +17,10 @@ namespace SpMV
     public:
         SparseMatrix(const size_t nrows, const size_t ncols);
         ~SparseMatrix();
+
+        void   setValue(const size_t i, const size_t j, double val);
+        double getValue(const size_t i, const size_t j);
+        void   assemble();
     };
 }
 
