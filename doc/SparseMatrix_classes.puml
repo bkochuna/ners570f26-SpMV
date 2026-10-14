@@ -1,0 +1,42 @@
+@startuml
+
+class SparseMatrix_DEN_DEN
+SparseMatrix_DEN_DEN : - numnz
+SparseMatrix_DEN_DEN : - ncols
+SparseMatrix_DEN_DEN : - nrows
+SparseMatrix_DEN_DEN : - a[][]
+
+class SparseMatrix_COO
+SparseMatrix_COO : - numnz
+SparseMatrix_COO : - ncols
+SparseMatrix_COO : - nrows
+SparseMatrix_COO : - aij[]
+SparseMatrix_COO : - idx_col[]
+SparseMatrix_COO : - idx_row[]
+
+class SparseMatrix_CSR
+SparseMatrix_CSR : - numnz
+SparseMatrix_CSR : - ncols
+SparseMatrix_CSR : - nrows
+SparseMatrix_CSR : - aij[]
+SparseMatrix_CSR : - ia[]
+SparseMatrix_CSR : - ja[]
+
+class SparseMatrix_ELLPACK
+SparseMatrix_ELLPACK : - numnz
+SparseMatrix_ELLPACK : - ncols
+SparseMatrix_ELLPACK : - nrows
+SparseMatrix_ELLPACK : - maxnumnz_row
+SparseMatrix_ELLPACK : - aij[]
+SparseMatrix_ELLPACK : - ja[][]
+
+class SparseMatrix_JDS
+SparseMatrix_JDS : - numnz
+SparseMatrix_JDS : - ncols
+SparseMatrix_JDS : - nrows
+SparseMatrix_JDS : - perm[]
+SparseMatrix_JDS : - jdiag[]
+SparseMatrix_JDS : - col_ind[]
+SparseMatrix_JDS : - jd_ptr[]
+
+@enduml

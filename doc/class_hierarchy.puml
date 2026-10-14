@@ -1,0 +1,10 @@
+@startuml
+
+abstract class "SparseMatrix"
+SparseMatrix <|-- SparseMatrix_DEN
+SparseMatrix <|-- SparseMatrix_COO
+SparseMatrix <|-- SparseMatrix_ELLPACK
+SparseMatrix <|-- SparseMatrix_CRS
+SparseMatrix <|-- SparseMatrix_JDS
+
+@enduml

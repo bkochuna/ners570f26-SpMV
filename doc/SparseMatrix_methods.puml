@@ -1,0 +1,14 @@
+@startuml
+
+abstract class SparseMatrix
+
+' Requried constructor/destructor
+SparseMatrix : + SparseMatrix()
+SparseMatrix : + ~SparseMatrix()
+SparseMatrix : + {static} getFormat()
+SparseMatrix : + setValues()
+SparseMatrix : + getValues()
+SparseMatrix : + {abstract} assembleStorage()
+SparseMatrix : + {abstract} matvec()
+
+@enduml

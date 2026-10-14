@@ -1,0 +1,11 @@
+@startuml
+
+class SparseMatrix
+SparseMatrix : - numnz
+SparseMatrix : - ncols
+SparseMatrix : - nrows
+' Requried constructor/destructor
+SparseMatrix : + SparseMatrix()
+SparseMatrix : + ~SparseMatrix()
+
+@enduml
