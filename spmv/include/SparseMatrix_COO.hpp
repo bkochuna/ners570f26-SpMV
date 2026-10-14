@@ -11,6 +11,9 @@ namespace SpMV
         public:
             SparseMatrix_COO(const size_t nrows, const size_t ncols);
             void assemble();
+
+            MatrixType       getFormat() const noexcept override;
+            std::string_view printFormat() const noexcept override;
     };
 }
 
