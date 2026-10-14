@@ -6,9 +6,9 @@ abstract class SparseMatrix
 SparseMatrix : + SparseMatrix()
 SparseMatrix : + ~SparseMatrix()
 SparseMatrix : + {static} getFormat()
-SparseMatrix : + setValues()
-SparseMatrix : + getValues()
-SparseMatrix : + {abstract} assembleStorage()
+SparseMatrix : + setValue()
+SparseMatrix : + getValue()
+SparseMatrix : + {abstract} assemble()
 SparseMatrix : + {abstract} matvec()
 
 @enduml
