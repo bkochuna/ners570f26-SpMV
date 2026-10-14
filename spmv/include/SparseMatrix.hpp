@@ -13,6 +13,7 @@ namespace SpMV
         size_t _nrows = 0;
         size_t _ncols = 0;
         size_t _numnz = 0;
+        int    _state = -1; //undefined
 
     public:
         SparseMatrix(const size_t nrows, const size_t ncols);
