@@ -1,11 +1,28 @@
 #ifndef __SPMV__
 #define __SPMV__
 
-// These first 2 lines prevent the following code from being included more than once!
+#include <iostream>
 
 namespace SpMV
 {
-  // Code goes here
+    class SparseMatrix
+    {
+    private:
+        /* data */
+    public:
+        SparseMatrix(/* args */);
+        ~SparseMatrix();
+    };
+
+    SparseMatrix::SparseMatrix(/* args */)
+    {
+        std::cout << "Hello from SparseMatrix Constructor!" << std::endl;
+    }
+
+    SparseMatrix::~SparseMatrix()
+    {
+        std::cout << "Hello from SparseMatrix Destructor!" << std::endl;
+    }
 }
 
 #endif
