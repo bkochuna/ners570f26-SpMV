@@ -2,6 +2,7 @@
 #define __SPMV__
 
 #include <iostream>
+#include <stddef.h>
 
 using namespace std;
 
@@ -10,9 +11,9 @@ namespace SpMV
     class SparseMatrix
     {
     private:
-        int _nrows = 0;
-        int _ncols = 0;
-        int _numnz = 0;
+        size_t _nrows = 0;
+        size_t _ncols = 0;
+        size_t _numnz = 0;
 
     public:
         SparseMatrix(int nrows, int ncols);
