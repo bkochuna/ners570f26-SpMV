@@ -1,0 +1,11 @@
+@startuml
+
+[*] --> Initialized : SparseMatrix Constructor
+Initialized -> Building : setValue()
+Building -> Building : setValue() \n getValue()
+Building --> Assembled : assemble()
+Assembled --> Building : setValue()
+Assembled --> Assembled : getValue()
+Assembled --> [*] : SparseMatrix Destructor
+
+@enduml

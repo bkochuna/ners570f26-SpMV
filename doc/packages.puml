@@ -1,0 +1,31 @@
+@startuml
+
+'left to right direction
+top to bottom direction
+
+package SpMV{
+    package spmv {
+        package src{
+            note "Functional spmv code here" as N1
+        }
+        package include{
+            note "header files" as N7
+        }
+        package tests{
+            note "Tests for spmv library here" as N2
+        }
+    }
+    package doc{
+        note "Documentation here" as N5
+    }
+    package cmake{
+        note "Custom CMake scripts here" as N4
+    }
+    package examples{
+        note "Example showing program using library" as N6
+    }
+    spmv .-> cmake
+    examples .-> spmv
+    doc .-> spmv
+}
+@enduml
