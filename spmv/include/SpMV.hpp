@@ -16,16 +16,14 @@ namespace SpMV
         size_t _numnz = 0;
 
     public:
-        SparseMatrix(int nrows, int ncols);
+        SparseMatrix(const size_t nrows, const size_t ncols);
         ~SparseMatrix();
     };
 
-    SparseMatrix::SparseMatrix(int nrows, int ncols) :
+    SparseMatrix::SparseMatrix(const size_t nrows, const size_t ncols) :
         _nrows(nrows), _ncols(ncols)
     {
         cout << "Hello from SparseMatrix Constructor!" << endl;
-        this->_nrows = nrows;
-        this->_ncols = ncols;
     }
 
     SparseMatrix::~SparseMatrix()
