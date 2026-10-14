@@ -10,6 +10,7 @@ namespace SpMV
 
     enum MatrixState {undefined, initialized, building, assembled};
 
+    template <class fp_type>
     class SparseMatrix
     {
     private:
@@ -23,9 +24,9 @@ namespace SpMV
         SparseMatrix(const size_t nrows, const size_t ncols);
         ~SparseMatrix();
 
-        void   setValue(const size_t i, const size_t j, double val);
-        double getValue(const size_t i, const size_t j);
         void   assemble();
+        void    setValue(const size_t i, const size_t j, fp_type val);
+        fp_type getValue(const size_t i, const size_t j);
     };
 }
 

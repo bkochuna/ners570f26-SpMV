@@ -6,7 +6,8 @@
 namespace SpMV
 {
 
-SparseMatrix::SparseMatrix(const size_t nrows, const size_t ncols) :
+template <class fp_type>
+SparseMatrix<fp_type>::SparseMatrix(const size_t nrows, const size_t ncols) :
     _nrows(nrows), _ncols(ncols)
 {
     assert(this->_state == MatrixState::undefined);
@@ -15,7 +16,8 @@ SparseMatrix::SparseMatrix(const size_t nrows, const size_t ncols) :
     assert(this->_state == MatrixState::initialized);
 }
 
-SparseMatrix::~SparseMatrix()
+template <class fp_type>
+SparseMatrix<fp_type>::~SparseMatrix()
 {
     cout << "Hello from SparseMatrix Destructor!" << endl;
     cout << "this->_nrows=" << this->_nrows << endl;
@@ -24,7 +26,8 @@ SparseMatrix::~SparseMatrix()
     this->_state=MatrixState::undefined;
 }
 
-void SparseMatrix::setValue(const size_t i, const size_t j, double val)
+template <class fp_type>
+void SparseMatrix<fp_type>::setValue(const size_t i, const size_t j, fp_type val)
 {
     assert(this->_state >= MatrixState::initialized);
     this->_state = MatrixState::building;
@@ -36,7 +39,8 @@ void SparseMatrix::setValue(const size_t i, const size_t j, double val)
     assert(this->_state == MatrixState::building);
 }
 
-double SparseMatrix::getValue(const size_t i, const size_t j)
+template <class fp_type>
+fp_type SparseMatrix<fp_type>::getValue(const size_t i, const size_t j)
 {
     assert(this->_state > MatrixState::initialized);
 
@@ -45,7 +49,8 @@ double SparseMatrix::getValue(const size_t i, const size_t j)
     return 0.0;
 }
 
-void SparseMatrix::assemble()
+template <class fp_type>
+void SparseMatrix<fp_type>::assemble()
 {
     assert(this->_state > MatrixState::building);
     cout << "Hello from assemble()" << endl;
@@ -55,3 +60,8 @@ void SparseMatrix::assemble()
 }
 
 }
+
+// Need to declare the concrete templates within the library for
+// use in code that links to libspmv
+template class SpMV::SparseMatrix<float>;
+template class SpMV::SparseMatrix<double>;
