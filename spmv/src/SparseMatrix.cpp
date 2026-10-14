@@ -9,10 +9,10 @@ namespace SpMV
 SparseMatrix::SparseMatrix(const size_t nrows, const size_t ncols) :
     _nrows(nrows), _ncols(ncols)
 {
-    assert(this->_state == UNDEFINED);
+    assert(this->_state == MatrixState::undefined);
     cout << "Hello from SparseMatrix Constructor!" << endl;
-    this->_state = 0;
-    assert(this->_state == INITIALIZED);
+    this->_state = MatrixState::initialized;
+    assert(this->_state == MatrixState::initialized);
 }
 
 SparseMatrix::~SparseMatrix()
@@ -21,24 +21,25 @@ SparseMatrix::~SparseMatrix()
     cout << "this->_nrows=" << this->_nrows << endl;
     cout << "this->_ncols=" << this->_ncols << endl;
     cout << "this->_numnz=" << this->_numnz << endl;
-    this->_state=UNDEFINED;
+    this->_state=MatrixState::undefined;
 }
 
 void SparseMatrix::setValue(const size_t i, const size_t j, double val)
 {
-    assert(this->_state >= INITIALIZED);
-    this->_state = BUILDING; // building
+    assert(this->_state >= MatrixState::initialized);
+    this->_state = MatrixState::building;
 
     cout << "i=" << i << endl;
     cout << "j=" << j << endl;
     cout << "val=" << val << endl;
 
-    assert(this->_state == BUILDING);
+    assert(this->_state == MatrixState::building);
 }
 
 double SparseMatrix::getValue(const size_t i, const size_t j)
 {
-    assert(this->_state > INITIALIZED);
+    assert(this->_state > MatrixState::initialized);
+
     cout << "i=" << i << endl;
     cout << "j=" << j << endl;
     return 0.0;
@@ -46,10 +47,11 @@ double SparseMatrix::getValue(const size_t i, const size_t j)
 
 void SparseMatrix::assemble()
 {
-    assert(this->_state > 0);
+    assert(this->_state > MatrixState::building);
     cout << "Hello from assemble()" << endl;
-    this->_state = ASSEMBLED; // assembled
-    assert(this->_state == ASSEMBLED);
+
+    this->_state = MatrixState::assembled;
+    assert(this->_state == MatrixState::assembled);
 }
 
 }
