@@ -18,6 +18,8 @@ namespace SpMV
     void SparseMatrix_COO<fp_type>::assemble()
     {
         cout << "Hello from COO assemble" << endl;
+
+        //This routine needs to convert _buildCoeff into the COO storage format.
     }
 }
 
