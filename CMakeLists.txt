@@ -32,6 +32,7 @@ spmv_add_cxx_compiler_flag("-Wundef")
 spmv_add_cxx_compiler_flag("-Werror")
 spmv_add_cxx_compiler_flag("-Wold-style-cast")
 spmv_add_cxx_compiler_flag("-pedantic")
+spmv_add_cxx_compiler_flag("-Wsign-conversion")
 
 add_subdirectory(spmv)
 add_subdirectory(examples)
