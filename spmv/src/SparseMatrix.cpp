@@ -49,16 +49,6 @@ fp_type SparseMatrix<fp_type>::getValue(const size_t i, const size_t j)
     return 0.0;
 }
 
-template <class fp_type>
-void SparseMatrix<fp_type>::assemble()
-{
-    assert(this->_state > MatrixState::building);
-    cout << "Hello from assemble()" << endl;
-
-    this->_state = MatrixState::assembled;
-    assert(this->_state == MatrixState::assembled);
-}
-
 }
 
 // Need to declare the concrete templates within the library for

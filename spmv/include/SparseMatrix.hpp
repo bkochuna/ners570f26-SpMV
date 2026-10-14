@@ -13,7 +13,7 @@ namespace SpMV
     template <class fp_type>
     class SparseMatrix
     {
-    private:
+    protected:
         MatrixState _state = MatrixState::undefined;
              size_t _nrows = 0;
              size_t _ncols = 0;
@@ -22,11 +22,11 @@ namespace SpMV
 
     public:
         SparseMatrix(const size_t nrows, const size_t ncols);
-        ~SparseMatrix();
+        virtual ~SparseMatrix();
 
-        void   assemble();
         void    setValue(const size_t i, const size_t j, fp_type val);
         fp_type getValue(const size_t i, const size_t j);
+        virtual void assemble() =0; // The "=0" defines this class as abstract
     };
 }
 
