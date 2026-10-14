@@ -2,6 +2,8 @@
 #define __SPMV_SparseMatrix__
 
 #include <stddef.h>
+#include <map>
+#include <utility>
 
 using namespace std;
 
@@ -18,6 +20,8 @@ namespace SpMV
              size_t _nrows = 0;
              size_t _ncols = 0;
              size_t _numnz = 0;
+
+        std::map<std::pair<size_t, size_t>, fp_type> _buildCoeff;
         
 
     public:

@@ -30,7 +30,14 @@ template <class fp_type>
 void SparseMatrix<fp_type>::setValue(const size_t i, const size_t j, fp_type val)
 {
     assert(this->_state >= MatrixState::initialized);
+    assert(i < this->_nrows);
+    assert(j < this->_ncols);
+
     this->_state = MatrixState::building;
+
+    //Store value
+    this->_buildCoeff[std::make_pair(i,j)] = val;
+    this->_numnz = this->_buildCoeff.size();
 
     cout << "i=" << i << endl;
     cout << "j=" << j << endl;
