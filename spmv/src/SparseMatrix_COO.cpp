@@ -21,6 +21,18 @@ namespace SpMV
 
         //This routine needs to convert _buildCoeff into the COO storage format.
     }
+
+    template <class fp_type>
+    MatrixType SparseMatrix_COO<fp_type>::getFormat() const noexcept
+    {
+        return MatrixType::COO;
+    }
+
+    template <class fp_type>
+    std::string_view SparseMatrix_COO<fp_type>::printFormat() const noexcept
+    {
+        return "COO";
+    }
 }
 
 // Need to declare the concrete templates within the library for

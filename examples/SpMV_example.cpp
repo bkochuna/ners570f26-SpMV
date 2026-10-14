@@ -8,7 +8,10 @@ int main(/* int argc, char* argv[] */)
     SpMV::SparseMatrix<float>* ptr_A = new SpMV::SparseMatrix_COO<float>(20,20);
 
     ptr_A->setValue(0,0,0.0);
-
+    if( ptr_A->getFormat() == SpMV::MatrixType::COO) {
+      std::cout << "ptr_A is COO!" << std::endl;
+    }
+    std::cout << ptr_A->printFormat() << std::endl;
     // New scoping unit. This means variables defined in here, stay here.
     {
         SpMV::SparseMatrix_COO<double> A = SpMV::SparseMatrix_COO<double>(10000,10);

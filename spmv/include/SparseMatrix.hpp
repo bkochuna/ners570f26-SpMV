@@ -1,9 +1,10 @@
 #ifndef __SPMV_SparseMatrix__
 #define __SPMV_SparseMatrix__
 
-#include <stddef.h>
-#include <map>
-#include <utility>
+#include <stddef.h>     //for std::size_t
+#include <map>          //for std::map
+#include <utility>      //for std::pair
+#include <string_view>  //for std::string_view
 
 using namespace std;
 
@@ -11,6 +12,7 @@ namespace SpMV
 {
 
     enum MatrixState {undefined, initialized, building, assembled};
+    enum MatrixType  {DEN, COO, CSR, ELL, JDS};
 
     template <class fp_type>
     class SparseMatrix
@@ -30,7 +32,9 @@ namespace SpMV
 
         void    setValue(const size_t i, const size_t j, fp_type val);
         fp_type getValue(const size_t i, const size_t j);
-        virtual void assemble() =0; // The "=0" defines this class as abstract
+        virtual void             assemble()                   =0; // The "=0" defines this class as abstract
+        virtual MatrixType       getFormat()   const noexcept =0; // const means its a static function
+        virtual std::string_view printFormat() const noexcept =0; // No except means it does not raise an exception
     };
 }
 
