@@ -54,6 +54,10 @@ spmv_add_cxx_compiler_flag("-Wold-style-cast")
 spmv_add_cxx_compiler_flag("-pedantic")
 spmv_add_cxx_compiler_flag("-Wsign-conversion")
 
+# Enable testing with CTest
+include(CTest)
+enable_testing()
+
 # Process the library and examples
 add_subdirectory(spmv)
 add_subdirectory(examples)
