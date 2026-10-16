@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  rocky8:
+    name: RockyLinux 8
+    runs-on: ubuntu-24.04
+    container: rockylinux:8
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show Runner Info
+        run: |
+          whoami
+          id
+          cat /etc/os-release
+          uname -a
+          lscpu
+
+      - name: Install prereqs
+        run: |
+          dnf install -y \
+            gcc gcc-c++ gcc-gfortran \
+            cmake make git findutils \
+            which diffutils
+
+      - name: Configure
+        timeout-minutes: 240
+        run: |
+          cmake -S ./ -B ./build 
+
+      - name: Build
+        run: |
+          cmake --build ./build
+
+      - name: Test
+        run: |
+          ctest
