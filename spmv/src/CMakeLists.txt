@@ -1,5 +1,3 @@
-hello(${CMAKE_CURRENT_SOURCE_DIR})
-
 # Create a CMake variable listing all the source files
 file(GLOB SPMV_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
