@@ -47,7 +47,7 @@ void SparseMatrix<fp_type>::setValue(const size_t i, const size_t j, fp_type val
 }
 
 template <class fp_type>
-fp_type SparseMatrix<fp_type>::getValue(const size_t i, const size_t j)
+fp_type SparseMatrix<fp_type>::getValue(const size_t i, const size_t j) const noexcept
 {
     assert(this->_state > MatrixState::initialized);
 
