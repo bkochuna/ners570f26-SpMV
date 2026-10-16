@@ -1,3 +1,3 @@
-include(${PROJECT_SOURCE_DIR}/cmake/spmv_add_test.cmake)
+include(spmv_add_test)
 
 spmv_add_test(./example_unit_test.cpp)
