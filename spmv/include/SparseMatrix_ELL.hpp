@@ -10,31 +10,25 @@ namespace SpMV
     {
         // Private variables for ELL
         private:
+            // Variables for ELL format storage
             size_t max_row_length = 0;
             std::vector<size_t> col_idx;
-            std::vector<double> vals;
-            //double * vals;
-
+            std::vector<fp_type> vals;
+            
         public:
             SparseMatrix_ELL(const size_t nrows, const size_t ncols);
-            void assemble();
-
-            MatrixType       getFormat() const noexcept override;
-            std::string_view printFormat() const noexcept override;
 
             // Setters (change information) and getters (grab/return information) for ELL
-            size_t getMaxRowLength() const {
+            void setValue(const size_t i, const size_t j, fp_type val); // Set row index, column index, and value read from Matrix Market
+            fp_type getValue(const size_t i, const size_t j);
+
+            // Read-only getters for any matrix inspection
+            const size_t& getMaxRowLength() const {
                 return max_row_length;
             }
-            void setMaxRowLength(size_t newRowLength) {
-                max_row_length = newRowLength;
+            const std::vector<size_t>& getColIdx() const {
+                return col_idx;
             }
-
-            //const std::vector<double> getValues() const { // Similar one in SparseMatrix... maybe just call that?
-            //    return vals;
-            //}
-            fp_type getValue(const size_t i, const size_t j,); // Get value from SparseMatrix
-            const std::vector<size_t> getColumnIdx(const size_t j);
 
     };
 }
