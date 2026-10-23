@@ -33,6 +33,26 @@ namespace SpMV
     {
         return "ELL";
     }
+
+    template <class fp_type>
+    void SparseMatrix_ELL<fp_type>::view()
+    {
+        assert(this->_state == MatrixState::assembled);
+
+        size_t nrows = this->_nrows;
+        size_t maxnz_row = this->_maxnz_row;
+
+        std::ofstream outfile("ELL.view");
+
+        for (size_t i=0; i<nrows*maxnz_row; i++)
+        {
+            outfile << std:setw(10) << this->_ja[i] << ' ' << this->_vals[i] << '\n';
+        }
+
+        outfile.close();
+    }
+
+
 }
 
 // Need to declare the concrete templates within the library for

@@ -14,6 +14,8 @@ namespace SpMV
 
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;
+
+            void view();
     };
 }
 
