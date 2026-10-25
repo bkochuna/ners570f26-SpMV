@@ -60,6 +60,7 @@ namespace SpMV
 
         return val;
     }
+    // =================================================================================
 
     // FROM WHAT WAS GIVEN TO US:
     template <class fp_type>
