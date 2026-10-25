@@ -128,10 +128,10 @@ namespace SpMV
 
     // matrix-vector multiplication - Hanga
     template <class fp_type>
-    fp_type* SparseMatrix_JDS<fp_type>::matvec(fp_type* vecin, size_t nmults=1) // set nmults=1 by default in case the user is lazy
+    vector<fp_type> SparseMatrix_JDS<fp_type>::matvec(vector<fp_type> vecin, size_t nmults) // NOTE: default is nmults=1 in header file
     {
         // make sure our matrix is actually ready to go
-        assert(this->_state == MatrixState::assembled)
+        assert(this->_state == MatrixState::assembled);
         cout << "Matrix-vector multiplication starting..." << endl;
 
         // row and column indices, 
@@ -165,7 +165,7 @@ namespace SpMV
                     // get column index
                     j = this->col_idx[l_idx+t];
                     // do the multiplication
-                    vecout[i] = vecout[i] + this->values[l_idx+t]*vecin_temp[j];
+                    vecout[i] = vecout[i] + this->value[l_idx+t]*vecin_temp[j];
                 }
             }
             // if we're not on the last iteration
@@ -174,7 +174,7 @@ namespace SpMV
                 // make last output vector the new input vector
                 vecin_temp = vecout;
                 // and zero out the output vector
-                fill(vecout.begin(), vecout.end(), 0.0)
+                fill(vecout.begin(), vecout.end(), 0.0);
             }        
         }
 
