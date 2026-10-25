@@ -18,6 +18,8 @@ namespace SpMV
         MatrixType getFormat() const noexcept override;
         std::string_view printFormat() const noexcept override;
 
+        fp_type* matvec(fp_type* vecin, size_t nmults);
+
     protected:
         size_t max_row_size; // size of row with maximum number of non-zeros in matrix
         vector<size_t> row_map; 

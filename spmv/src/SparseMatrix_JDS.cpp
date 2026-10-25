@@ -125,6 +125,63 @@ namespace SpMV
     {
         return "JDS";
     }
+
+    // matrix-vector multiplication - Hanga
+    template <class fp_type>
+    fp_type* SparseMatrix_JDS<fp_type>::matvec(fp_type* vecin, size_t nmults=1) // set nmults=1 by default in case the user is lazy
+    {
+        // make sure our matrix is actually ready to go
+        assert(this->_state == MatrixState::assembled)
+        cout << "Matrix-vector multiplication starting..." << endl;
+
+        // row and column indices, 
+        // starting index of largest row, 
+        // number of rows in chunk of nonzeros
+        size_t i, j, l_idx, nrows_chunk;
+        // output vector - initialize to be all zeros
+        // in case a row of the matrix turns out to be all zeros
+        // and thus gets skipped over during the matvec routine
+        vector<fp_type> vecout(this->_nrows, 0);
+
+        // local temporary copy of vecin that can be overwritten if nmults>1
+        vector<fp_type> vecin_temp = vecin;
+        
+        // loop through desired number of multiplications
+        for (size_t n = 0; n < nmults; n++)
+        {
+            // loop through iter_ptr array; max_row_size may be zero, but that's okay
+            for (size_t k = 0; k < this->max_row_size; k++)
+            {
+                // get starting index of largest row
+                l_idx = this->iter_ptr[k];
+                // get number of rows before next column
+                nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
+                
+                // iterate over rows in this chunk of the array
+                for (size_t t = 0; t < nrows_chunk; t++)
+                {
+                    // get row index
+                    i = this->row_srt_idx[t];
+                    // get column index
+                    j = this->col_idx[l_idx+t];
+                    // do the multiplication
+                    vecout[i] = vecout[i] + this->values[l_idx+t]*vecin_temp[j];
+                }
+            }
+            // if we're not on the last iteration
+            if (n < nmults-1)
+            {
+                // make last output vector the new input vector
+                vecin_temp = vecout;
+                // and zero out the output vector
+                fill(vecout.begin(), vecout.end(), 0.0)
+            }        
+        }
+
+        cout << "Done!" << endl;
+        return vecin;
+    }
+
 }
 
 // Need to declare the concrete templates within the library for
