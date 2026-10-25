@@ -1,42 +1,48 @@
-// #include "SparseMatrix_COO.hpp"
+#include "SparseMatrix_JDS.hpp"
 
-// #include <iostream>
-// #include <stddef.h>
+#include <iostream>
+#include <stddef.h>
 
-// using namespace std;
+using namespace std;
 
-// namespace SpMV
-// {
-//     template <class fp_type>
-//     SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nrows, const size_t ncols) : SparseMatrix<fp_type>::SparseMatrix(nrows, ncols)
-//     {
-//         cout << "Hello from COO Constructor" << endl;
-//     }
+namespace SpMV
+{
+    template <class fp_type>
+    SparseMatrix_JDS<fp_type>::SparseMatrix_JDS(const size_t nrows, const size_t ncols) : 
+    SparseMatrix<fp_type>::SparseMatrix(nrows, ncols)
+    {
+        cout << "Hello from JDS Constructor" << endl;
+    }
 
-//     template <class fp_type>
-//     void SparseMatrix_COO<fp_type>::assemble()
-//     {
-//         cout << "Hello from COO assemble" << endl;
+    template <class fp_type>
+    void SparseMatrix_JDS<fp_type>::assemble()
+    {
+        cout << "Hello from JDS assemble" << endl;
 
-//         // This routine needs to convert _buildCoeff into the COO storage format.
-//     }
+        // This routine needs to convert _buildCoeff into the COO storage format.
+    }
 
-//     template <class fp_type>
-//     MatrixType SparseMatrix_COO<fp_type>::getFormat() const noexcept
-//     {
-//         return MatrixType::COO;
-//     }
+    template <class fp_type>
+    void SparseMatrix_JDS<fp_type>::disassemble()
+    {
+        cout << "Hello from JDS disassemble" << endl;
+    }
 
-//     template <class fp_type>
-//     std::string_view SparseMatrix_COO<fp_type>::printFormat() const noexcept
-//     {
-//         return "COO";
-//     }
-// }
+    template <class fp_type>
+    MatrixType SparseMatrix_JDS<fp_type>::getFormat() const noexcept
+    {
+        return MatrixType::JDS;
+    }
 
-// // Need to declare the concrete templates within the library for
-// // use in code that links to libspmv
-// template class SpMV::SparseMatrix_COO<float>;
-// template class SpMV::SparseMatrix_COO<double>;
+    template <class fp_type>
+    std::string_view SparseMatrix_JDS<fp_type>::printFormat() const noexcept
+    {
+        return "JDS";
+    }
+}
 
-//time to start work
+// Need to declare the concrete templates within the library for
+// use in code that links to libspmv
+template class SpMV::SparseMatrix_JDS<float>;
+template class SpMV::SparseMatrix_JDS<double>;
+
