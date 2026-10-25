@@ -95,7 +95,7 @@ namespace SpMV
 
 		// Useful attributes
 		size_t N = this->_nrows;
-		size_t nnz = this->_numnz;
+		// size_t nnz = this->_numnz;
 
 		// Clear old data
 		this->_buildCoeff.clear();
