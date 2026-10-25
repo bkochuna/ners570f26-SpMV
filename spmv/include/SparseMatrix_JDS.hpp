@@ -2,6 +2,7 @@
 #define __SPMV_SparseMatrix_JDS__
 
 #include "SparseMatrix.hpp"
+#include <cstddef>
 #include <vector>
 
 namespace SpMV
@@ -19,10 +20,10 @@ namespace SpMV
 
     protected:
         size_t max_row_size; // size of row with maximum number of non-zeros in matrix
-        vector<int> row_map; 
-        vector<int> row_srt_idx; // row indices sorted
-        vector<int> col_idx; // column index of each entry in value array
-        vector<int> iter_ptr; // array of indices for col_idx corresponding to each entry from the longest non-zero row of the matrix 
+        vector<size_t> row_map; 
+        vector<size_t> row_srt_idx; // row indices sorted
+        vector<size_t> col_idx; // column index of each entry in value array
+        vector<size_t> iter_ptr; // array of indices for col_idx corresponding to each entry from the longest non-zero row of the matrix 
         vector<fp_type> value; //matrix values
     };
 }
