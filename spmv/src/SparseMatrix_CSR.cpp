@@ -3,12 +3,33 @@
 #include <iostream>
 #include <stddef.h>
 #include <vector>
+#include <cassert>
 
 using namespace std;
 
 namespace SpMV
 {	
 	template <class fp_type>
+	// added lines 
+	SparseMatrix_CSR<fp_type>::SparseMatrix_CSR(const size_t nrows, const size_t ncols) :
+		SparseMatrix<fp_type>(nrows, ncols)
+	{
+	}
+
+	template <class fp_type>
+	MatrixType SparseMatrix_CSR<fp_type>::getFormat() const noexcept
+	{
+		return MatrixType::CSR;
+	}
+
+	template <class fp_type>
+	std::string_view SparseMatrix_CSR<fp_type>::printFormat() const noexcept
+	{
+		return "CSR";
+	}
+
+	template <class fp_type>
+	// end of added lines
     void SparseMatrix_CSR<fp_type>::assemble()
 	{
 		// This routine converts _buildCoeff into the CSR storage format.
