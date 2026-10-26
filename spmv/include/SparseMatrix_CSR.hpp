@@ -23,6 +23,8 @@ namespace SpMV
 
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;
+
+            void matvec(size_t nmults, vector <fp_type>& vec) const;
     };
 }
 
