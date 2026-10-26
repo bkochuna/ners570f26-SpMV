@@ -21,6 +21,14 @@ namespace SpMV
             // Overloaded constructors
             SparseMatrix_COO(const size_t nnz, const size_t* ia, const size_t* ja, const fp_type* vals);
             SparseMatrix_COO(const vector<size_t>& ia, const vector<size_t>& ja, const vector<fp_type>& vals);
+
+            //Copy and Move constructors
+            SparseMatrix_COO(const SparseMatrix_COO& other);                 //Copy
+            SparseMatrix_COO& operator=(const SparseMatrix_COO& other);      //Copy assignment
+            SparseMatrix_COO(SparseMatrix_COO&& other) noexcept;             //Move
+            SparseMatrix_COO& operator=(SparseMatrix_COO&& other) noexcept;  //Move assginment
+            
+            ~SparseMatrix_COO(); // Destructor
             void assemble();
 
             MatrixType       getFormat()   const noexcept override;

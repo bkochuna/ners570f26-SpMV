@@ -10,7 +10,17 @@ using namespace std;
 
 namespace SpMV
 {
-
+    /**
+     * @brief Constructs SparseMatrix_COO with default constructor
+     *
+     * Only calls base-class (SparseMatrix) constructor
+     *
+     * @param nrows Number of rows in the matrix
+     * @param ncols Number of columns in the matrix
+     *
+     * @pre deferred to base class
+     * @post deferred to base class
+     */
     template <class fp_type>
     SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nrows, const size_t ncols) : 
         SparseMatrix<fp_type>(nrows,ncols) {/* base class constructor only*/}
@@ -107,6 +117,103 @@ namespace SpMV
         assert(this->getState() == assembled);
     }
 
+    /**
+     * @brief Copy constructor
+     *
+     * Creates a `SparseMatrix_COO` by deep-copying another `SparseMatrix_COO`
+     *
+     * @param other the matrix to copy
+     *
+     * @pre the other matrix exists
+     * @post two matrices are equal (TBD -- need to overload == operator)
+     */
+    template <class fp_type>
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const SparseMatrix_COO& other) :
+        SparseMatrix<fp_type>(1,1)
+    {
+        assert(other.getState() != MatrixState::undefined);
+        this->_state = other._state;
+
+        if(other.getState() >= MatrixState::initialized) {
+            this->_nrows = other._nrows;
+            this->_ncols = other._ncols;
+        }
+
+        if(other.getState() >= MatrixState::building) {
+            this->_numnz = other._numnz;
+            this->_buildCoeff = other._buildCoeff;
+        }
+
+        if(other.getState() >= MatrixState::assembled) {
+            this->_numnz = other._numnz;
+            // Allocate
+            this->_ia = new size_t[this->_numnz];
+            this->_ja = new size_t[this->_numnz];
+            this->_vals = new fp_type[this->_numnz];
+             // Copy
+            copy_n(other._ia,this->_numnz,this->_ia);
+            copy_n(other._ja,this->_numnz,this->_ja);
+            copy_n(other._vals,this->_numnz,this->_vals);
+        }
+        
+    }
+
+    /**
+     * @brief Overloads assignment operator for copying
+     *
+     * Performs a deep-copy during assignment with `A = B`
+     * 
+     * @param other the LHS matrix to copy
+     *
+     * @return a copy of the RHS Sparse Matrix
+     *
+     * @pre TBD
+     * @post TBD
+     */
+    template <class fp_type>
+    SparseMatrix_COO<fp_type>& SparseMatrix_COO<fp_type>::operator=(const SparseMatrix_COO<fp_type>& other)
+    {
+        if(this == &other) {
+            return *this;
+        }
+        
+        // Create a local copy
+        SparseMatrix_COO a_copy(other);
+        
+        // Swap the base-class state.
+        swap(this->_nrows, a_copy._nrows);
+        swap(this->_ncols, a_copy._ncols);
+
+        swap(this->_numnz, a_copy._numnz);
+        swap(this->_ia, a_copy._ia);
+        swap(this->_ja, a_copy._ja);
+        swap(this->_vals, a_copy._vals);
+        return *this;
+    }
+    
+    /**
+     * @brief COO Destructor
+     *
+     * Must delete `_ia`, `_ja`, and `_vals` attributes. 
+     */
+    template <class fp_type>
+    SparseMatrix_COO<fp_type>::~SparseMatrix_COO()
+    {
+        delete[] this->_ia; this->_ia = nullptr;
+        delete[] this->_ja; this->_ja = nullptr;
+        delete[] this->_vals; this->_vals = nullptr;
+        // Base class destructor executes next
+    }
+    
+    /**
+     * @brief Converts matrix data to COO storage format
+     *
+     * Specifically converts the base-class storage format defined by
+     * `_buildCoeff
+     *
+     * @pre values in the matrix have been set
+     * @post base class storage is empty, state is assembled
+     */
     template <class fp_type>
     void SparseMatrix_COO<fp_type>::assemble()
     {
