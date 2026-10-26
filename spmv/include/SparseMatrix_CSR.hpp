@@ -20,6 +20,7 @@ namespace SpMV
             SparseMatrix_CSR(const size_t nrows, const size_t ncols);
             void assemble() override;
             void disassemble();
+            void view() const;
 
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;
