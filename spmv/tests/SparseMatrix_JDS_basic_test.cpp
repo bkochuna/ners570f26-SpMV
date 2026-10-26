@@ -1,121 +1,146 @@
-// #include "SpMV.hpp"
+#include "SpMV.hpp"
+#include "SparseMatrix.hpp"
+#include "SparseMatrix_JDS.hpp"
+//#include <gtest/gtest.h> commented because not sure if independent set/get tests are needed and do not totally understand how to do this
 
-// #include <vector> // std::vector
+// Testing library required for testing (Always include this last!)
+#include "unit_test_framework.hpp"
 
-// // Testing library required for testing (Always include this last!)
-// #include "unit_test_framework.hpp"
+// Use ASSERT(condition) to test if a condition is true.
+// Direct comparison of floating point numbers is not recommended, so we define
+// ASSERT_NEAR(a, b, epsilon) to test if a and b are within epsilon of each
+// other.
 
-// // Use ASSERT(condition) to test if a condition is true.
-// // Direct comparison of floating point numbers is not recommended, so we define
-// // ASSERT_NEAR(a, b, epsilon) to test if a and b are within epsilon of each
-// // other.
-
-// // Create a unit test
-// TEST_CASE(compareVectors)
-// {
-
-//     // Initialize variables for testing
-//     std::vector<int> const a = {1, 2, 3};
-//     std::vector<int> const b = {1, 2, 3};
-
-//     // Test that the elements are equal
-//     for (size_t i = 0; i < a.size(); ++i)
-//     {
-//         ASSERT(a[i] == b[i]);
+// class JDSSparseMatrixTestFixture : public ::testing::Test {  commented because not sure if independent set/get tests are needed and do not totally understand how to do this
+// protected:
+//     // Helper to test GET: Injects a hardcoded valid JDS structure
+//     void injectRawJDSState(JDSSparseMatrix& matrix,
+//                            const std::vector<double>& d,
+//                            const std::vector<size_t>& c_idx,
+//                            const std::vector<size_t>& jdl_arr,
+//                            const std::vector<size_t>& perm) {
+//         matrix.data = d;
+//         matrix.col_idx = c_idx;
+//         matrix.jdl = jdl_arr;
+//         matrix.permutation = perm;
 //     }
+// };
 
-//     // Repeat for floating point numbers
-//     std::vector<double> x = {1, 2, 3};
-//     std::vector<double> y = {1, 2, 3.00001};
+// Test initialization
+template <typename T> TEST_CASE(test_initialization) {
+  // Standard initializations
+  SpMV::SparseMatrix_JDS<T> test(3, 6);
 
-//     // One should avoid floating point equality comparisons due to rounding errors
-//     // We will briefly turn off compiler warnings about this to demonstrate why
-// #pragma GCC diagnostic push
-// #pragma GCC diagnostic ignored "-Wfloat-equal"
-//     //
-//     // In ℝ (real numbers), 0.1 + 0.2 == 0.3
-//     // However, in finite precision binary arithmetic, 0.1 + 0.2 != 0.3
-//     // In binary 0.1 is an irrational number, hence in finite precision it is
-//     // truncated, incuring a rounding error.
-//     ASSERT(0.1 + 0.2 != 0.3); // Will evaluate to true if 0.1 + 0.2 != 0.3
-// #pragma GCC diagnostic pop
+  // Edge Cases
+  SpMV::SparseMatrix_JDS<T> test_0(0, 0);
+  SpMV::SparseMatrix_JDS<T> test_1(1, 1);
+}
 
-//     // Instead, we can test if the numbers are within a small epsilon of each
-//     // other
-//     for (size_t i = 0; i < x.size(); ++i)
-//     {
-//         ASSERT_NEAR(x[i], y[i], 1e-3);
-//     }
-// } // compareVectors
+// Test Formats
+template <typename T> TEST_CASE(test_get_format) {
+  SpMV::SparseMatrix_JDS<T> test(2, 2);
+  ASSERT(test.getFormat() == 0);
+  ASSERT(test.printFormat() == "JDS");
+}
 
-// // Create a test suite
-// TEST_SUITE(my_suite)
-// {
-//     // Run the unit test when the suite is run
-//     TEST(compareVectors);
-// } // my_suite
+// Test State
+template <typename T> TEST_CASE(test_state) {
+  SpMV::SparseMatrix_JDS<T> test(4, 4);
 
-// // We can also create templated tests and suites
-// template <typename T>
-// TEST_CASE(addition)
-// {
-//     T const a = 1;
-//     T const b = 2;
-//     T const c = 3;
-//     ASSERT(a + b == c);
-// } // addition
+  ASSERT(test.getState() == SpMV::MatrixState::initialized);
+  ASSERT(test.getCoeffMap().empty());
+}
 
-// template <typename T>
-// TEST_CASE(subtraction)
-// {
-//     T const a = 3;
-//     T const b = 2;
-//     T const c = 1;
-//     ASSERT(a - b == c);
-// } // subtraction
+// Test Dimensions
+template <typename T> TEST_CASE(test_dim) {
+  SpMV::SparseMatrix_JDS<T> test(6, 9);
+  auto nrows = test.getNrows();
+  auto ncols = test.getNcols();
+  auto nnz = test.getNumnz();
 
-// template <size_t N, typename T>
-// TEST_CASE(fixed_size_dot_product)
-// {
-//     // Create an array of N 1's and an array of N 2's
-//     T a[N];
-//     T b[N];
-//     for (size_t i = 0; i < N; ++i)
-//     {
-//         a[i] = 1;
-//         b[i] = 2;
-//     }
+  ASSERT(nrows == 6);
+  ASSERT(ncols == 9);
+  ASSERT(nnz == 0);
+}
 
-//     // Compute the dot product
-//     T dot = 0;
-//     for (size_t i = 0; i < N; ++i)
-//     {
-//         dot += a[i] * b[i];
-//     }
+// Basic Test Suite
+template <typename T> TEST_SUITE(basic_suite) {
+  TEST(test_initialization<T>);
+  TEST(test_get_format<T>);
+  TEST(test_state<T>);
+  TEST(test_dim<T>);
+}
 
-//     // Compare to the solution
-//     T const soln = 2 * N;
-//     ASSERT(dot == soln);
-// } // fixed_size_dot_product
+// Accessor Test cases
+template <typename T> TEST_CASE(test_get_initial_value) {
+  SpMV::SparseMatrix_JDS<T> test(2, 2);
+  auto val = test.getValue(0,0);
+  ASSERT_NEAR(val,0,1e-3);
+}
 
-// template <typename T>
-// TEST_SUITE(add_sub_suite)
-// {
-//     TEST(addition<T>);
-//     TEST(subtraction<T>);
-//     // Use parentheses to pass a function with multiple template arguments.
-//     // This is necessary because a comma is used to separate arguments in a
-//     // template argument list as well as arguments to a macro
-//     TEST((fixed_size_dot_product<3, T>));
-//     TEST((fixed_size_dot_product<4, T>));
-// } // add_sub_suite
+template <typename T> TEST_CASE(test_set_value) {
+  SpMV::SparseMatrix_JDS<T> test(2, 2);
+  test.setValue(0,0,1.0);
+  val = test.getValue(0,0);
+  ASSERT_NEAR(val, 1, 1e-3);
+}
 
-// auto main() -> int
-// {
-//     // Run the unit tests. If a test fails, the program will print failure info
-//     // and return 1.
-//     RUN_SUITE(my_suite);
-//     RUN_SUITE(add_sub_suite<int>);
-//     RUN_SUITE(add_sub_suite<size_t>);
-//     return 0;
-// }
+template <typename T> TEST_CASE(test_reset_value) {
+  SpMV::SparseMatrix_JDS<T> test(2, 2);
+  test.setValue(0,0,1.0);
+  test.setValue(0,0,2.0);
+  val = test.getValue(0,0);
+  ASSERT_NEAR(val,0,2.0);
+}
+
+template <typename T> TEST_CASE(test_set_value_outofboundexception) {
+  SpMV::SparseMatrix_JDS<T> test(2, 2);
+  bool exceptionThrown = false;
+  try
+  {
+      test.setValue(3,3,1.0);
+  }
+  catch(ExceptionType&) // special exception type
+  {
+      exceptionThrown = true;
+  }
+  catch(...) // or any exception at all
+  {
+      exceptionThrown = true;
+  }
+  ASSERT(exceptionThrown); 
+}
+
+template <typename T> TEST_CASE(test_get_value_outofboundexception) {
+  SpMV::SparseMatrix_JDS<T> test(2, 2);
+  bool exceptionThrown = false;
+  try
+  {
+      test.getValue(3,3);
+  }
+  catch(ExceptionType&) // special exception type
+  {
+      exceptionThrown = true;
+  }
+  catch(...) // or any exception at all
+  {
+      exceptionThrown = true;
+  }
+  ASSERT(exceptionThrown); 
+}
+
+template <typename T> TEST_SUITE(accessor_suite) {
+  TEST(test_get_initial_value<T>);
+  TEST(test_set_value<T>);
+  TEST(test_reset_value<T>);
+  TEST(test_set_value_outofboundexception<T>);
+  TEST(test_get_value_outofboundexception<T>);
+}
+
+auto main() -> int {
+  RUN_SUITE(basic_suite<float>);
+  RUN_SUITE(basic_suite<double>);
+  RUN_SUITE(accessor_suite<float>);
+  RUN_SUITE(accessor_suite<double>);
+  return 0;
+}
