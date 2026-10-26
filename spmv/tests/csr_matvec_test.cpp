@@ -8,22 +8,26 @@
 using namespace std;
 
 #define TOL_DOUBLE 1e-12
-#define TOL_FLOAT 1e-5
+#define TOL_FLOAT 1e-5f
 
 template <class fp_type>
-bool test_csr_matvec_basic(double tol)
+bool test_csr_matvec_basic(fp_type tol)
 {
     SpMV::SparseMatrix_CSR<fp_type> A(3, 3);
 
-    A.setValue(0, 0, 0.1);
-    A.setValue(0, 2, 0.2);
-    A.setValue(1, 1, -0.3);
-    A.setValue(2, 0, 0.4);
+    A.setValue(0, 0, static_cast<fp_type>(0.1));
+    A.setValue(0, 2, static_cast<fp_type>(0.2));
+    A.setValue(1, 1, static_cast<fp_type>(-0.3));
+    A.setValue(2, 0, static_cast<fp_type>(0.4));
     A.setValue(2, 2, 0.5);
     A.assemble();
 
-    vector<fp_type> vec = {0.3, -0.2, 0.7};
-    vector<fp_type> expected = {0.17, 0.06, 0.47};
+    vector<fp_type> vec = {static_cast<fp_type>(0.3),
+                           static_cast<fp_type>(-0.2),
+                           static_cast<fp_type>(0.7)};
+    vector<fp_type> expected = {static_cast<fp_type>(0.17),
+                                static_cast<fp_type>(0.06),
+                                static_cast<fp_type>(0.47)};
 
     A.matvec(1, vec);
 
@@ -55,7 +59,7 @@ bool test_csr_matvec_basic(double tol)
 }
 
 template <class fp_type>
-bool test_csr_matvec_identity(double tol)
+bool test_csr_matvec_identity(fp_type tol)
 {
     SpMV::SparseMatrix_CSR<fp_type> A(3, 3);
 
@@ -83,7 +87,7 @@ bool test_csr_matvec_identity(double tol)
 }
 
 template <class fp_type>
-bool test_csr_matvec_empty_rows(double tol)
+bool test_csr_matvec_empty_rows(fp_type tol)
 {
     SpMV::SparseMatrix_CSR<fp_type> A(5, 5);
 
@@ -112,7 +116,7 @@ bool test_csr_matvec_empty_rows(double tol)
 }
 
 template <class fp_type>
-bool test_csr_matvec_repeated(double tol)
+bool test_csr_matvec_repeated(fp_type tol)
 {
     SpMV::SparseMatrix_CSR<fp_type> A(2, 2);
 
@@ -142,7 +146,7 @@ bool test_csr_matvec_repeated(double tol)
 }
 
 template <class fp_type>
-bool run_csr_matvec_tests(double tol)
+bool run_csr_matvec_tests(fp_type tol)
 {
     bool all_passed = true;
 
