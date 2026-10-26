@@ -19,4 +19,10 @@ namespace SpMV
     };
 }
 
+std::vetcor<double> matvec{
+    const SparseMatrix_ELL& A, 
+    const std::vector<double>& x
+};
+   
+
 #endif
