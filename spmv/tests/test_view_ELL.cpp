@@ -20,11 +20,11 @@ TEST_CASE(ELL_createViewFile) {
 
 	// Assertion 
 	if (!infile.is_open()) {
-		std::cerr << "TEST FAILED: The file path does not exist -> " << file_path <<std::end;
+		std::cerr << "TEST FAILED: The file path does not exist -> " << file_path << std::endl;
 		ASSERT(infile.is_open());
 	}
 	infile.close();
-	std::remove(file_path);
+	std::remove(file_path.c_str());
 }
 
 // Check if output file is written in
@@ -43,7 +43,7 @@ TEST_CASE(ELL_writtenViewFile) {
 
 	std::string output = buffer.str();
 
-	ASSERT(!output.empty() && "TEST FAILED: File is empty!")
+	ASSERT(!output.empty() && "TEST FAILED: File is empty!");
 }
 
 // Check if output file is in Matrix Market format
