@@ -272,7 +272,7 @@ namespace SpMV
         }
 
         cout << "Done!" << endl;
-        return vecin;
+        return vecout;
     }
 
 }
