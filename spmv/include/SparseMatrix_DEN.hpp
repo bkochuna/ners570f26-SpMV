@@ -13,7 +13,12 @@ namespace SpMV {
 				void matvec(std::vector<fp_type> inputVec, std::vector<fp_type> outputVec);
 
 				std::vector<std::vector<fp_type> > _a; 
-			};
+				void assemble();
+				void disassemble();
+
+				MatrixType       getFormat() const noexcept override;
+				std::string_view printFormat() const noexcept override;
+		};
 }
 
 #endif
