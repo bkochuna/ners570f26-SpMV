@@ -43,7 +43,7 @@ template <typename T> TEST_CASE(test_initialization) {
 // Test Formats
 template <typename T> TEST_CASE(test_get_format) {
   SpMV::SparseMatrix_JDS<T> test(2, 2);
-  ASSERT(test.getFormat() == 0);
+  ASSERT(test.getFormat() == SpMV::MatrixType::JDS);
   ASSERT(test.printFormat() == "JDS");
 }
 
@@ -212,10 +212,141 @@ template <typename T> TEST_SUITE(accessor_suite) {
   TEST(test_get_value_empty<T>);
 }
 
+// Assembly/disassembly unit tests - Hanga
+
+template <typename T>
+TEST_CASE(nominalAssembleDisassemble)
+{
+    // testing the nominal use case
+    // using a predefined 5x5 lower triangular matrix
+    // except for an empty row at row index 3
+    size_t m = 5; // nrows
+    size_t n = 5; // ncols
+
+    // create JDS matrix instance
+    SpMV::SparseMatrix_JDS<T> test_matrix(m, n);
+
+    // matrix entry - starts at 1.0
+    T mij = 1.0;
+    // matrix entry taken from assembled matrix later
+    T test_mij = 0.0;
+
+    // set test matrix values
+    for (size_t i=0; i<m; i++)
+    {
+        if (i!=3)
+        {
+            for (size_t j=0; j<=i; j++)
+            {
+                test_matrix.setValue(i, j, mij);
+                mij += static_cast<T>(1.0);
+            }
+
+        }
+    }
+
+    // assemble matrix
+    test_matrix.assemble();
+
+    // see if it assembled
+    ASSERT(test_matrix.getState() == SpMV::MatrixState::assembled);
+
+    // test if values are what they should be
+    mij = 1.0;
+    for (size_t i=0; i<5; i++)
+    {
+        if (i!=3)
+        {
+            for (size_t j=0; j<n; j++)
+            {
+                // make sure nonzero values are where they should be
+                // and are what they should be
+                if (j<=i)
+                {
+                    test_mij = test_matrix.getValue(i, j);
+                    ASSERT_NEAR(mij, test_mij, static_cast<T>(1e-3));
+                    mij += static_cast<T>(1.0);
+                }
+                // also test that values that weren't explicitly set are zero
+                else
+                {
+                    test_mij = test_matrix.getValue(i, j);
+                    ASSERT_NEAR(static_cast<T>(0.0), test_mij, static_cast<T>(1e-3));
+                }
+            }
+
+        }
+        else // testing that the empty row is full of only zeros
+        {
+            for (size_t j=0; j<n; j++)
+            {
+                test_mij = test_matrix.getValue(i, j);
+                ASSERT_NEAR(static_cast<T>(0.0), test_mij, static_cast<T>(1e-3));
+            }
+        }
+    }
+
+    // disassemble matrix
+    test_matrix.disassemble();
+    ASSERT(test_matrix.getState() == SpMV::MatrixState::building);
+    // test matrix will be destroyed automatically once out of scope
+}
+
+template <typename T>
+TEST_CASE(assembleImpliedDisassemble)
+{
+    // testing if disassemble works when setValue called
+    // just using a simple 2x2 identity matrix for this one
+
+    size_t m = 2; // nrows & ncols
+
+    // create JDS matrix instance
+    SpMV::SparseMatrix_JDS<T> id_matrix(m, m);
+
+    // set identity matrix values
+    for (size_t i=0; i<m; i++)
+    {
+        id_matrix.setValue(i, i, static_cast<T>(1.0));
+    }
+
+    // assemble matrix
+    id_matrix.assemble();
+    // now call setValue on very first element
+    id_matrix.setValue(0, 0, static_cast<T>(-1.0));
+    // and check matrix state
+    ASSERT(id_matrix.getState() == SpMV::MatrixState::building);
+    // test matrix will be destroyed automatically once out of scope
+}
+
+template <typename T>
+TEST_CASE(emptyAssembleDisassemble)
+{
+    // make 2x2 test matrix
+    SpMV::SparseMatrix_JDS<T> test_matrix(2,2);
+    // assemble it just to make sure it doesn't break
+    // making sure its values are zero is handled by test_get_value_empty case
+    test_matrix.assemble();
+    // disassemble it to make sure it doesn't break
+    test_matrix.disassemble();
+    
+}
+
+
+template <typename T>
+TEST_SUITE(assemble_suite)
+{
+    TEST(nominalAssembleDisassemble<T>);
+    TEST(assembleImpliedDisassemble<T>);
+    TEST(emptyAssembleDisassemble<T>);
+}
+
+
 auto main() -> int {
   RUN_SUITE(basic_suite<float>);
   RUN_SUITE(basic_suite<double>);
   RUN_SUITE(accessor_suite<float>);
   RUN_SUITE(accessor_suite<double>);
+  RUN_SUITE(assemble_suite<float>);
+  RUN_SUITE(assemble_suite<double>);
   return 0;
 }
