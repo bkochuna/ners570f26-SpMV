@@ -65,7 +65,7 @@ namespace SpMV
         return y;
     }
 
-    
+}
 
 // Need to declare the concrete templates within the library for
 // use in code that links to libspmv
