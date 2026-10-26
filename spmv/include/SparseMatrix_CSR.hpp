@@ -21,6 +21,11 @@ namespace SpMV
             void assemble() override;
             void disassemble();
             void view() const;
+			// Accessor returns A(i,j) read from CSR array once assembled.
+			[[nodiscard]] fp_type getValue(const size_t i, const size_t j) const noexcept override;
+			[[nodiscard]] const size_t* getRowPtr() const noexcept; // _ia, length nrows + 1
+			[[nodiscard]] const size_t* getColIdx() const noexcept; // _ja, length numnz
+			[[nodiscard]] const fp_type* getValues() const noexcept; // _aij, length numnz
 
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;

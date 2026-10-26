@@ -22,6 +22,32 @@ namespace SpMV
 		return MatrixType::CSR;
 	}
 
+	// Getters:
+	// .data() gives point o vector's array
+	// asserts only when assembled
+	// Names _ia, _ja, and _aij match to defined CSR Matrix class
+	
+	template <class fp_type>
+	const size_t* SparseMatrix_CSR<fp_type>::getRowPtr() const noexcept
+	{
+		assert(this->_state == MatrixState::assembled);
+		return this->_ia.data();
+	}
+
+	template <class fp_type>
+	const size_t* SparseMatrix_CSR<fp_type>::getColIdx() const noexcept
+	{
+		assert(this->_state == MatrixState::assembled);
+		return this->_ja.data();
+	}
+
+	template <class fp_type>
+	const fp_type* SparseMatrix_CSR<fp_type>::getValues() const noexcept
+	{
+		assert(this->_state == MatrixState::assembled);
+		return this->_aij.data();
+	}
+
 	template <class fp_type>
 	std::string_view SparseMatrix_CSR<fp_type>::printFormat() const noexcept
 	{
@@ -30,7 +56,8 @@ namespace SpMV
 
 	template <class fp_type>
 	// end of added lines
-    void SparseMatrix_CSR<fp_type>::assemble()
+    
+	void SparseMatrix_CSR<fp_type>::assemble()
 	{
 		// This routine converts _buildCoeff into the CSR storage format.
 		assert(this->_state == MatrixState::building);
@@ -113,6 +140,31 @@ namespace SpMV
 		this->_aij.clear();
 
 		this->_state = MatrixState::building;
+	}
+
+	// Getter for A(i,j)
+	template <class fp_type>
+	fp_type SparseMatrix_CSR<fp_type>::getValue(const size_t i, const size_t j) const noexcept
+	{
+		assert(this->_state > MatrixState::initialized);
+		assert(i < this->_nrows);
+		assert(j < this->_ncols);
+
+		// Building: values live in the _buildCoeff map (unset entries are zero)
+		if (this->_state == MatrixState::building) {
+			const auto it = this->_buildCoeff.find(std::make_pair(i, j));
+			return (it != this->_buildCoeff.end()) ? it->second : static_cast<fp_type>(0);
+		}
+
+		// Assembled: row i entries are stored at positions _ia[i] .. _ia[i+1]-1
+		for (size_t k = this->_ia[i]; k < this->_ia[i + 1]; ++k) {
+			if (this->_ja[k] == j) {
+				return this->_aij[k];
+			}
+		}
+
+		// (i,j) is not stored, so it is a zero of the sparse matrix
+		return static_cast<fp_type>(0);
 	}
 
 
