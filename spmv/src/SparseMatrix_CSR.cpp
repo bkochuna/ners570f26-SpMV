@@ -136,6 +136,30 @@ namespace SpMV
 		}
 	}
 
+    template <class fp_type>
+    void SparseMatrix_CSR<fp_type>::matvec(size_t nmults, 
+                                            vector<fp_type>& vec) const
+    {
+        assert(this->_state == MatrixState::assembled);
+        assert(vec.size() == this->_nrows);
+
+        vector<fp_type> in { vec };
+        vector<fp_type> out ( this->_nrows );
+
+        for (size_t n = 0; n < nmults; n++) {
+            for (size_t i = 0; i < this->_nrows; i++) {
+                fp_type sum { 0 };
+                for (size_t c = _ia[i]; c < _ia[i + 1]; c++) {
+                    sum += _aij[c] * in[_ja[c]];
+                }
+                out[i] = sum;
+            }
+            // swaps
+            swap(in, out);
+        }
+        vec = move(in);
+    }
+    
 }
 
 // Need to declare the concrete templates within the library for
