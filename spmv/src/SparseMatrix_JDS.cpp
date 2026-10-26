@@ -193,7 +193,7 @@ namespace SpMV
             }
         }
 
-        if (val == fp_type{0})
+        if (!(val > fp_type{0}) && !(val < fp_type{0}))
         {
             return;
         }
