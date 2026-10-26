@@ -18,6 +18,11 @@ namespace SpMV
         MatrixType getFormat() const noexcept override;
         std::string_view printFormat() const noexcept override;
 
+        void setValue(const size_t i, const size_t j, fp_type val); // Setter for the JDS matrix. Takes in inputs and stores them.
+        
+        [[nodiscard]] // Warning if the return value is not used
+        fp_type getValue(const size_t i, const size_t j) const noexcept; // Getter for the JDS matrix. Takes in inputs and returns the value at that location.
+
         vector<fp_type> matvec(vector<fp_type> vecin, size_t nmults=1); // set nmults=1 by default in case the user is lazy
 
     protected:

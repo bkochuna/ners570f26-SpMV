@@ -126,6 +126,83 @@ namespace SpMV
         return "JDS";
     }
 
+    // Getter for the JDS matrix. Takes in inputs and returns the value at that location. - Steven
+    template <class fp_type>
+    fp_type SparseMatrix_JDS<fp_type>::getValue(const size_t i, const size_t j) const noexcept
+    {
+        assert(i < this->_nrows);
+        assert(j < this->_ncols);
+
+        if (this->_state != MatrixState::assembled)
+        {
+            auto it = this->_buildCoeff.find(std::make_pair(i, j));
+            if (it != this->_buildCoeff.end())
+            {
+                return it->second;
+            }
+            return fp_type{0};
+        }
+        
+        const size_t sorted_row = this->row_map[i];
+        for (size_t k=0; k < this->max_row_size; ++k)
+        {
+            const size_t nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
+
+            if (sorted_row >= nrows_chunk)
+            {
+                continue;
+            }
+            const size_t idx = this->iter_ptr[k] + sorted_row;
+            if (this->col_idx[idx] == j)
+            {
+                return this->value[idx];
+            }
+        }
+
+        return fp_type{0};
+    }
+
+    // Setter for the JDS matrix. Takes in inputs and stores them. - Steven
+    template <class fp_type> void SparseMatrix_JDS<fp_type>::setValue(const size_t i, const size_t j, fp_type val)
+    {
+        assert(i < this->_nrows);
+        assert(j < this->_ncols);
+
+        assert(this->_state >= MatrixState::initialized);
+        if (this->_state != MatrixState::assembled)
+        {
+            SparseMatrix<fp_type>::setValue(i, j, val);
+            return;
+        }
+
+        const size_t sorted_row = this->row_map[i];
+        for (size_t k=0; k < this->max_row_size; ++k)
+        {
+            const size_t nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
+
+            if (sorted_row >= nrows_chunk)
+            {
+                continue;
+            }
+
+            const size_t idx = this->iter_ptr[k] + sorted_row;
+            if (this->col_idx[idx] == j)
+            {
+                this->value[idx] = val;
+                return;
+            }
+        }
+
+        if (val == fp_type{0})
+        {
+            return;
+        }
+
+        this->disassemble();
+        SparseMatrix<fp_type>::setValue(i, j, val);
+        this->assemble();
+    }
+
     // matrix-vector multiplication - Hanga
     template <class fp_type>
     vector<fp_type> SparseMatrix_JDS<fp_type>::matvec(vector<fp_type> vecin, size_t nmults) // NOTE: default is nmults=1 in header file
