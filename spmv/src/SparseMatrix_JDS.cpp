@@ -130,12 +130,15 @@ namespace SpMV
     template <class fp_type>
     fp_type SparseMatrix_JDS<fp_type>::getValue(const size_t i, const size_t j) const noexcept
     {
+        // Makes sure the requested row and column are within the bounds of the matrix
         assert(i < this->_nrows);
         assert(j < this->_ncols);
 
+        // If the matrix is not assembled, we can just use the base class's getValue method
         if (this->_state != MatrixState::assembled)
         {
             auto it = this->_buildCoeff.find(std::make_pair(i, j));
+            // If the entry is found, return its value; otherwise, return 0
             if (it != this->_buildCoeff.end())
             {
                 return it->second;
@@ -143,15 +146,20 @@ namespace SpMV
             return fp_type{0};
         }
         
+        // If the matrix is assembled, convert the original row index to the sorted row position in JDS storage
         const size_t sorted_row = this->row_map[i];
+        // Search through each jagged diagonal to find requested entry
         for (size_t k=0; k < this->max_row_size; ++k)
         {
+            // Calculate number of entries stored in diagonal k
             const size_t nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
 
+            // If the sorted row index is greater than or equal to the number of rows in this diagonal, continue to the next diagonal
             if (sorted_row >= nrows_chunk)
             {
                 continue;
             }
+            // Calculate the index in the flattened JDS arrays for the requested entry
             const size_t idx = this->iter_ptr[k] + sorted_row;
             if (this->col_idx[idx] == j)
             {
@@ -159,6 +167,7 @@ namespace SpMV
             }
         }
 
+        // If the entry does not exist, return 0
         return fp_type{0};
     }
 
@@ -168,39 +177,46 @@ namespace SpMV
         assert(i < this->_nrows);
         assert(j < this->_ncols);
 
+        // Makes sure the matrix is initialized before setting a value
         assert(this->_state >= MatrixState::initialized);
+        // If the matrix is not assembled, we can just use the base class's setValue method
         if (this->_state != MatrixState::assembled)
         {
             SparseMatrix<fp_type>::setValue(i, j, val);
             return;
         }
 
+        // If matrix is assembled, convert the original row index to the sorted row position in JDS storage
         const size_t sorted_row = this->row_map[i];
+
+        // Search through each jagged diagonal to find requested entry
         for (size_t k=0; k < this->max_row_size; ++k)
         {
+            // Calculate number of entries stored in diagonal k
             const size_t nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
 
+            // If the sorted row index is greater than or equal to the number of rows in this diagonal, continue to the next diagonal
             if (sorted_row >= nrows_chunk)
             {
                 continue;
             }
 
+            // Calculate the index in the flattened JDS arrays for the requested entry
             const size_t idx = this->iter_ptr[k] + sorted_row;
+            // Check if the column index at this position matches the requested column index
             if (this->col_idx[idx] == j)
             {
+                // If the entry already exists, update its value and return
                 this->value[idx] = val;
                 return;
             }
         }
 
+        // If the entry does not exist, it remains absent
         if (!(val > fp_type{0}) && !(val < fp_type{0}))
         {
             return;
         }
-
-        this->disassemble();
-        SparseMatrix<fp_type>::setValue(i, j, val);
-        this->assemble();
     }
 
     // matrix-vector multiplication - Hanga
