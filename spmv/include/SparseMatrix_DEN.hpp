@@ -15,6 +15,9 @@ namespace SpMV
             void assemble();
             void disassemble();
 
+            // Accessors
+            [[nodiscard]] fp_type getValue(const size_t i, const size_t j) const noexcept override;
+
             std::vector<std::vector<fp_type>> _a;
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;

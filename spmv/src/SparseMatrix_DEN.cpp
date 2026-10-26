@@ -61,6 +61,22 @@ namespace SpMV
     }
 
     template <class fp_type>
+    fp_type SparseMatrix_DEN<fp_type>::getValue(const size_t i, const size_t j) const noexcept
+    {
+        assert(this->_state > MatrixState::initialized);
+        assert(i < this->_nrows);
+        assert(j < this->_ncols);
+
+        // Assembled: read directly from the dense storage
+        if (this->_state == MatrixState::assembled)
+            return this->_a[i][j];
+
+        // Building: read from the build coefficients (unset entries are zero)
+        const auto it = this->_buildCoeff.find(std::make_pair(i, j));
+        return (it != this->_buildCoeff.end()) ? it->second : static_cast<fp_type>(0);
+    }
+
+    template <class fp_type>
     MatrixType SparseMatrix_DEN<fp_type>::getFormat() const noexcept
     {
         return MatrixType::DEN;
