@@ -6,6 +6,10 @@
 // Testing library required for testing (Always include this last!)
 #include "unit_test_framework.hpp"
 
+// Need these for viewing
+#include <sstream>
+#include <string>
+
 // Use ASSERT(condition) to test if a condition is true.
 // Direct comparison of floating point numbers is not recommended, so we define
 // ASSERT_NEAR(a, b, epsilon) to test if a and b are within epsilon of each
@@ -63,10 +67,33 @@ template <typename T> TEST_CASE(test_dim) {
   ASSERT(nnz == 0);
 }
 
-// Test viewing the JDS matrix format
-template <typename T> TEST_CASE(test_view_format)
+// Test that the JDS matrix view displays readable information - Steven
+template <typename T> TEST_CASE(test_view)
 {
-  
+    SpMV::SparseMatrix_JDS<T> test(3, 3);
+
+    test.setValue(0, 0, T{1.0});
+    test.setValue(0, 2, T{2.0});
+    test.setValue(1, 1, T{3.0});
+
+    test.assemble();
+
+    // Capture the view output in a string stream
+    std::ostringstream output;
+    test.view(output);
+
+    // Check that the output contains readable matrix information
+    std::string result = output.str();
+
+    ASSERT(result.find("JDS matrix") != std::string::npos);
+    ASSERT(result.find("Dimensions: 3 x 3") != std::string::npos);
+    ASSERT(result.find("Nonzeros: 3") != std::string::npos);
+    ASSERT(result.find("State: assembled") != std::string::npos);
+    ASSERT(result.find("row_srt_idx") != std::string::npos);
+    ASSERT(result.find("row_map") != std::string::npos);
+    ASSERT(result.find("iter_ptr:") != std::string::npos);
+    ASSERT(result.find("col_idx:") != std::string::npos);
+    ASSERT(result.find("value:") != std::string::npos);
 }
 
 // Basic Test Suite
@@ -75,6 +102,7 @@ template <typename T> TEST_SUITE(basic_suite) {
   TEST(test_get_format<T>);
   TEST(test_state<T>);
   TEST(test_dim<T>);
+  TEST(test_view<T>);
 }
 
 // Accessor Test cases
