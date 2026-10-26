@@ -179,44 +179,17 @@ namespace SpMV
 
         // Makes sure the matrix is initialized before setting a value
         assert(this->_state >= MatrixState::initialized);
-        // If the matrix is not assembled, we can just use the base class's setValue method
-        if (this->_state != MatrixState::assembled)
+
+        // If the matrix is assembled, disassemble it first
+        if (this->_state == MatrixState::assembled)
         {
-            SparseMatrix<fp_type>::setValue(i, j, val);
-            return;
+            this->disassemble();
         }
 
-        // If matrix is assembled, convert the original row index to the sorted row position in JDS storage
-        const size_t sorted_row = this->row_map[i];
+        // Use the base class setter to update the entry in _buildCoeff
+        SparseMatrix<fp_type>::setValue(i, j, val);
 
-        // Search through each jagged diagonal to find requested entry
-        for (size_t k=0; k < this->max_row_size; ++k)
-        {
-            // Calculate number of entries stored in diagonal k
-            const size_t nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
-
-            // If the sorted row index is greater than or equal to the number of rows in this diagonal, continue to the next diagonal
-            if (sorted_row >= nrows_chunk)
-            {
-                continue;
-            }
-
-            // Calculate the index in the flattened JDS arrays for the requested entry
-            const size_t idx = this->iter_ptr[k] + sorted_row;
-            // Check if the column index at this position matches the requested column index
-            if (this->col_idx[idx] == j)
-            {
-                // If the entry already exists, update its value and return
-                this->value[idx] = val;
-                return;
-            }
-        }
-
-        // If the entry does not exist, it remains absent
-        if (!(val > fp_type{0}) && !(val < fp_type{0}))
-        {
-            return;
-        }
+        
     }
 
     // matrix-vector multiplication - Hanga
