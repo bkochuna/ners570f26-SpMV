@@ -15,6 +15,20 @@ namespace SpMV
     SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nrows, const size_t ncols) : 
         SparseMatrix<fp_type>(nrows,ncols) {/* base class constructor only*/}
 
+    /**
+     * @brief Constructs SparseMatrix_COO from raw pointers
+     *
+     * Input arguments are basic COO storage arrays and dimension info. Row and
+     * col dimensions are inferred from index arrays.
+     *
+     * @param nnz the number of nonzeros in matrix (size of ia, ja, and vals)
+     * @param ia pointer to `nnz` row indices
+     * @param ja pointer to `nnz` column indices
+     * @param vals pointer to `nnz` nonzero values
+     *
+     * @pre `ia`, `ja`, and `vals` are not null, `nnz > 0`
+     * @post constructed object owns copies of dummy arg arrays. State is assembled.
+     */
     template <class fp_type>
     SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nnz, const size_t* ia, const size_t* ja, const fp_type* vals) : 
         SparseMatrix<fp_type>(1,1)
@@ -49,6 +63,19 @@ namespace SpMV
         assert(this->getState() == assembled);
     }
 
+    /**
+     * @brief  Constructs SparseMatrix_COO from vectors
+     *
+     * Input arguments are vectors corresponding to basic COO storage arrays. Dimension
+     * info is taken from vectors.
+     *
+     * @param ia the pointer array row indices as a vector
+     * @param ja the pointer array for column indices as a vector
+     * @param vals the pointer array for the nonzero matrix values as a vector
+     *
+     * @pre all vectors are equal length greater than 0
+     * @post constructed object owns copies of dummy arg arrays. State is assembled.
+     */
     template <class fp_type>
     SparseMatrix_COO<fp_type>::SparseMatrix_COO(const vector<size_t>& ia, const vector<size_t>& ja, const vector<fp_type>& vals) :
         SparseMatrix<fp_type>(1,1)
@@ -96,6 +123,10 @@ namespace SpMV
         return MatrixType::COO;
     }
 
+    /**
+     * @brief Static function returns child class matrix type as a string
+     * @return "COO" as a `std::string_view`
+     */
     template <class fp_type>
     std::string_view SparseMatrix_COO<fp_type>::printFormat() const noexcept
     {
