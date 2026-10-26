@@ -10,12 +10,15 @@ namespace SpMV
     class SparseMatrix_COO : public SparseMatrix<fp_type>
     {
         private:
+            // a better, more idiomatic way of doing this is with uniq_ptr or vector
             size_t*  _ia   = nullptr;
             size_t*  _ja   = nullptr;
             fp_type* _vals = nullptr;
 
         public:
             SparseMatrix_COO(const size_t nrows, const size_t ncols);
+
+            // Overloaded constructors
             SparseMatrix_COO(const size_t nnz, const size_t* ia, const size_t* ja, const fp_type* vals);
             SparseMatrix_COO(const vector<size_t>& ia, const vector<size_t>& ja, const vector<fp_type>& vals);
             void assemble();
