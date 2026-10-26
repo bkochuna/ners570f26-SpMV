@@ -63,6 +63,12 @@ template <typename T> TEST_CASE(test_dim) {
   ASSERT(nnz == 0);
 }
 
+// Test viewing the JDS matrix format
+template <typename T> TEST_CASE(test_view_format)
+{
+  
+}
+
 // Basic Test Suite
 template <typename T> TEST_SUITE(basic_suite) {
   TEST(test_initialization<T>);
