@@ -29,8 +29,16 @@ namespace SpMV
            CoeffMap _buildCoeff;
         
     public:
-        SparseMatrix(const size_t nrows, const size_t ncols);
+        // Default Constructor and Destructor
+        SparseMatrix(const size_t nrows, const size_t ncols); 
         virtual ~SparseMatrix();
+
+        // Copy and Move constructors
+        // "= default" means automagically generate assignments for each attribute
+        SparseMatrix(const SparseMatrix& that) = default;                 //Copy
+        SparseMatrix& operator=(const SparseMatrix& that) = default;      //Copy assignment
+        SparseMatrix(SparseMatrix&& that) noexcept = default;             //Move
+        SparseMatrix& operator=(SparseMatrix&& that) noexcept = default;  //Move assginment
 
         // Accessors
         [[nodiscard]] MatrixState     getState()    const noexcept { return _state; } //simple accessors are typically
