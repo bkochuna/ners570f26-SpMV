@@ -104,8 +104,10 @@ template <typename T> TEST_CASE(test_set) {
   test.assemble();
 
   test.setValue(0,0,static_cast<T>(5.7));
+  test.assemble();
   ASSERT_NEAR(static_cast<double>(test.getValue(0,0)),static_cast<double>(5.7),1e-3);
   test.setValue(0,2,static_cast<T>(-.1));
+  test.assemble();
   ASSERT_NEAR(static_cast<double>(test.getValue(0,2)),static_cast<double>(-.1),1e-3);
 }
 // Included in DBC for setValue
