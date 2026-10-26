@@ -25,6 +25,9 @@ namespace SpMV
 
         vector<fp_type> matvec(vector<fp_type> vecin, size_t nmults=1); // set nmults=1 by default in case the user is lazy
 
+        //friend class JDSSparseMatrixTestFixture; // included to be able to inpendently test set and get accessor methods, commented because not sure if this needed and do not totally understand how to do this
+
+
     protected:
         size_t max_row_size; // size of row with maximum number of non-zeros in matrix
         vector<size_t> row_map; 
