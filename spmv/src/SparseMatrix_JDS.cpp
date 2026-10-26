@@ -21,7 +21,7 @@ namespace SpMV
     void SparseMatrix_JDS<fp_type>::assemble()
     {
         // This routine converts _buildCoeff into the JDS storage format.
-        assert(this->_state == MatrixState::building);
+        assert(this->_state <= MatrixState::building);
         cout << "Hello from JDS assemble" << endl;
 
         this->_numnz = this->_buildCoeff.size();
