@@ -18,9 +18,10 @@ namespace SpMV
             
         public:
             SparseMatrix_ELL(const size_t nrows, const size_t ncols);
+            void assemble();
 
             // Setters (change information) and getters (grab/return information) for ELL
-            void setValue(const size_t i, const size_t j, fp_type val); // Set row index, column index, and value read from Matrix Market
+            //void setValue(const size_t i, const size_t j, fp_type val); // Set row index, column index, and value read from Matrix Market
 
             // Getters for any matrix inspection
             void setMaxRowLength(size_t length) {
