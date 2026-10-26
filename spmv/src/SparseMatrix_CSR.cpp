@@ -114,6 +114,28 @@ namespace SpMV
 
 		this->_state = MatrixState::building;
 	}
+
+
+	template <class fp_type>
+	void SparseMatrix_CSR<fp_type>::view() const
+	{
+		assert(this->_state == MatrixState::assembled);
+
+		cout << "CSR Matrix (" << this->_nrows << " x "
+			<< this->_ncols << "), nnz = "
+			<< this->_aij.size() << endl;
+
+		cout << "Row  Col  Value" << endl;
+
+		for (size_t i = 0; i < this->_nrows; ++i) {
+			for (size_t k = this->_ia[i]; k < this->_ia[i + 1]; ++k) {
+				cout << i << "    "
+					<< this->_ja[k] << "    "
+					<< this->_aij[k] << endl;
+			}
+		}
+	}
+
 }
 
 // Need to declare the concrete templates within the library for
