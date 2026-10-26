@@ -1,5 +1,6 @@
 #include "SparseMatrix_JDS.hpp"
 
+#include "SparseMatrix_JDS.hpp"
 #include <iostream>
 #include <stddef.h>
 #include <vector>
@@ -104,7 +105,6 @@ namespace SpMV
             this->_buildCoeff[{orig_row, orig_col}] = val;
         }
     }
-    
     row_map.clear();
     row_srt_idx.clear();
     col_idx.clear();
@@ -113,7 +113,53 @@ namespace SpMV
 
     this->_state = MatrixState::building;
     }
+// Display the matrix information without modifying it.
+    template <class fp_type>
+void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
+{
+    assert(this->_state == MatrixState::initialized ||
+           this->_state == MatrixState::building ||
+           this->_state == MatrixState::assembled);
 
+    out << "JDS matrix\n"
+        << "Dimensions: " << this->_nrows << " x " << this->_ncols << '\n'
+        << "Nonzeros: " << this->_numnz << '\n';
+
+    if (this->_state != MatrixState::assembled)
+    {
+        out << "State: "
+            << (this->_state == MatrixState::building ? "building" : "initialized")
+            << "\nJDS storage is not assembled.\n";
+        return;
+    }
+
+    out << "State: assembled\n";
+
+    out << "row_srt_idx (sorted to original):";
+    for (const auto index : this->row_srt_idx)
+        out << ' ' << index;
+    out << '\n';
+
+    out << "row_map (original to sorted):";
+    for (const auto index : this->row_map)
+        out << ' ' << index;
+    out << '\n';
+
+    out << "iter_ptr:";
+    for (const auto index : this->iter_ptr)
+        out << ' ' << index;
+    out << '\n';
+
+    out << "col_idx:";
+    for (const auto index : this->col_idx)
+        out << ' ' << index;
+    out << '\n';
+
+    out << "value:";
+    for (const auto entry : this->value)
+        out << ' ' << entry;
+    out << '\n';
+}
     template <class fp_type>
     MatrixType SparseMatrix_JDS<fp_type>::getFormat() const noexcept
     {

@@ -4,6 +4,7 @@
 #include "SparseMatrix.hpp"
 #include <cstddef>
 #include <vector>
+#include <iostream>
 
 namespace SpMV
 {
@@ -14,6 +15,7 @@ namespace SpMV
         SparseMatrix_JDS(const size_t nrows, const size_t ncols);
         void assemble();
         void disassemble(); // added for disassembly
+        void view(std::ostream& out = std::cout) const;
 
         MatrixType getFormat() const noexcept override;
         std::string_view printFormat() const noexcept override;
