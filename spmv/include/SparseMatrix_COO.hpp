@@ -31,10 +31,15 @@ namespace SpMV
             SparseMatrix_COO& operator=(SparseMatrix_COO&& other) noexcept;  //Move assginment
             
             ~SparseMatrix_COO(); // Destructor
-            void assemble();
-
+            
+            
             MatrixType       getFormat()   const noexcept override;
             std::string_view printFormat() const noexcept override;
+
+            void             assemble();
+
+            virtual fp_type*             matvec(const fp_type* x)             const noexcept;
+            virtual std::vector<fp_type> matvec(const std::vector<fp_type> x) const noexcept;
     };
 }
 

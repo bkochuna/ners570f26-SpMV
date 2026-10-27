@@ -323,6 +323,63 @@ namespace SpMV
     {
         return "COO";
     }
+
+    /**
+     * @brief Matvec operation for raw pointers
+     *
+     * Implements $y \gets Ax$ for $A$ stored in COO format.
+     *
+     * @param x the vector to multiply with A
+     *
+     * @pre matrix is assembled x is not null.
+     * @post None
+     */
+    template <class fp_type>
+    fp_type* SparseMatrix_COO<fp_type>::matvec(const fp_type* x) const noexcept
+    {
+        assert(this->getState() == MatrixState::assembled);
+        assert(x != nullptr);
+
+        fp_type* y = new fp_type[this->_nrows]{};
+        for(std::size_t n = 0; n < this->getNumnz(); ++n)
+        {
+            auto i   = this->_ia[n];
+            auto j   = this->_ja[n];
+            auto aij = this->_vals[n];
+
+            y[i] += aij*x[j];
+        }
+        
+        return y;
+    }
+
+    /**
+     * @brief Matvec operation for raw pointers
+     *
+     * Implements $y \gets Ax$ for $A$ stored in COO format.
+     *
+     * @param x the vector to multiply with A
+     *
+     * @pre matrix is assembled x same size as columns of A.
+     * @post None
+     */
+    template <class fp_type>
+    std::vector<fp_type> SparseMatrix_COO<fp_type>::matvec(const std::vector<fp_type> x) const noexcept
+    {
+        assert(this->getState() == MatrixState::assembled);
+        assert(x.size() == this->getNcols());
+
+        std::vector<fp_type> y(this->getNrows(),0.0);
+        for(std::size_t n = 0 ; n < this->getNumnz(); ++n)
+        {
+            auto i   = this->_ia[n];
+            auto j   = this->_ja[n];
+            auto aij = this->_vals[n];
+
+            y[i] += aij*x[j];
+        }
+        return y;
+    }
 }
 
 // Need to declare the concrete templates within the library for
