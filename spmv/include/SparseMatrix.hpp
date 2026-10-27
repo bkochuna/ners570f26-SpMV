@@ -11,8 +11,8 @@ using namespace std;
 namespace SpMV
 {
 
-    enum MatrixState {undefined, initialized, building, assembled};
-    enum MatrixType  {DEN, COO, CSR, ELL, JDS};
+    enum class MatrixState {undefined, initialized, building, assembled};
+    enum class MatrixType  {DEN, COO, CSR, ELL, JDS};
 
     template <class fp_type>
     class SparseMatrix

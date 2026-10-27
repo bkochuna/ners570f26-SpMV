@@ -70,7 +70,7 @@ namespace SpMV
         assert(equal(this->_ia,this->_ia + this->_numnz, ia, ia + nnz));
         assert(equal(this->_ja,this->_ja + this->_numnz, ja, ja + nnz));
         assert(equal(this->_vals,this->_vals + this->_numnz, vals, vals + nnz));
-        assert(this->getState() == assembled);
+        assert(this->getState() == MatrixState::assembled);
     }
 
     /**
@@ -114,7 +114,7 @@ namespace SpMV
         assert(equal(ia.begin(),ia.end(), this->_ia));
         assert(equal(ja.begin(),ja.end(), this->_ja));
         assert(equal(vals.begin(),vals.end(), this->_vals));
-        assert(this->getState() == assembled);
+        assert(this->getState() == MatrixState::assembled);
     }
 
     /**
