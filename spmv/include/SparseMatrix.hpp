@@ -18,13 +18,14 @@ namespace SpMV
     using key_type = std::pair<std::size_t, std::size_t>;
     using CoeffMap = std::map<key_type, fp_type>;  // Essentially defines an alias. Similar to a C typedef
 
-
     protected:
         MatrixState _state = MatrixState::undefined;
         std::size_t _nrows = 0;
         std::size_t _ncols = 0;
         std::size_t _numnz = 0;
            CoeffMap _buildCoeff;
+
+        virtual void _disassemble() noexcept =0;
         
     public:
         // Default Constructor and Destructor
