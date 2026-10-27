@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <vector>
 #include <cassert>
+#include <fstream>
 
 using namespace std;
 
@@ -169,23 +170,34 @@ namespace SpMV
 
 
 	template <class fp_type>
-	void SparseMatrix_CSR<fp_type>::view() const
+	void SparseMatrix_CSR<fp_type>::view(std::ostream& out) const
 	{
 		assert(this->_state == MatrixState::assembled);
 
-		cout << "CSR Matrix (" << this->_nrows << " x "
+		out << "CSR Matrix (" << this->_nrows << " x "
 			<< this->_ncols << "), nnz = "
 			<< this->_aij.size() << endl;
 
-		cout << "Row  Col  Value" << endl;
+		out << "Row  Col  Value" << endl;
 
 		for (size_t i = 0; i < this->_nrows; ++i) {
 			for (size_t k = this->_ia[i]; k < this->_ia[i + 1]; ++k) {
-				cout << i << "    "
+				out << i << "    "
 					<< this->_ja[k] << "    "
 					<< this->_aij[k] << endl;
 			}
 		}
+	}
+
+	template <class fp_type>
+	bool SparseMatrix_CSR<fp_type>::view(const std::string& filename) const
+	{
+		std::ofstream file(filename);
+		if (!file.is_open()) {
+			return false; // bad path, no permission, etc.
+		}
+		view(file);
+		return true;
 	}
 
     template <class fp_type>
