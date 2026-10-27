@@ -5,6 +5,7 @@
 #include <map>          //for std::map
 #include <utility>      //for std::pair
 #include <string_view>  //for std::string_view
+#include <vector>       //for std::vector
 
 namespace SpMV
 {
@@ -29,7 +30,7 @@ namespace SpMV
         
     public:
         // Default Constructor and Destructor
-        SparseMatrix(const size_t nrows, const size_t ncols); 
+        SparseMatrix(const std::size_t nrows, const std::size_t ncols); 
         virtual ~SparseMatrix();
 
         // Copy and Move constructors
@@ -56,6 +57,9 @@ namespace SpMV
         virtual void              assemble()                   =0; // The "=0" defines this class as abstract
         virtual MatrixType        getFormat()   const noexcept =0; // const means "this" cannot be modified except for mutable members
         virtual std::string_view  printFormat() const noexcept =0; // noexcept means it does not throw any exceptions
+
+        virtual fp_type*             matvec(const fp_type* x)             const noexcept =0;
+        virtual std::vector<fp_type> matvec(const std::vector<fp_type> x) const noexcept =0;
     };
 }
 
