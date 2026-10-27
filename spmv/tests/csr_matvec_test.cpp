@@ -19,7 +19,7 @@ bool test_csr_matvec_basic(fp_type tol)
     A.setValue(0, 2, static_cast<fp_type>(0.2));
     A.setValue(1, 1, static_cast<fp_type>(-0.3));
     A.setValue(2, 0, static_cast<fp_type>(0.4));
-    A.setValue(2, 2, 0.5);
+    A.setValue(2, 2, static_cast<fp_type>(0.5));
     A.assemble();
 
     vector<fp_type> vec = {static_cast<fp_type>(0.3),

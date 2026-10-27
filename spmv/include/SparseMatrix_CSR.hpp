@@ -5,6 +5,8 @@
 
 #include <cstddef> // added these
 #include <vector>
+#include <iostream>
+#include <string>
 
 namespace SpMV
 {
@@ -20,7 +22,11 @@ namespace SpMV
             SparseMatrix_CSR(const size_t nrows, const size_t ncols);
             void assemble() override;
             void disassemble();
-            void view() const;
+			
+			// Add view such that it defaults to screen but can be output to a file
+			void view(std::ostream& out = std::cout) const;
+			[[nodiscard]] bool view(const std::string& filename) const;
+
 			// Accessor returns A(i,j) read from CSR array once assembled.
 			[[nodiscard]] fp_type getValue(const size_t i, const size_t j) const noexcept override;
 			[[nodiscard]] const size_t* getRowPtr() const noexcept; // _ia, length nrows + 1
