@@ -33,10 +33,11 @@ namespace SpMV
             ~SparseMatrix_COO(); // Destructor
             
             
-            MatrixType       getFormat()   const noexcept override;
-            std::string_view printFormat() const noexcept override;
+            MatrixType            getFormat()   const noexcept override;
+            std::string_view      printFormat() const noexcept override;
+            [[nodiscard]] fp_type getValue(const std::size_t i, const std::size_t j) const noexcept override;
 
-            void             assemble();
+            void assemble();
 
             virtual fp_type*             matvec(const fp_type* x)             const noexcept;
             virtual std::vector<fp_type> matvec(const std::vector<fp_type> x) const noexcept;

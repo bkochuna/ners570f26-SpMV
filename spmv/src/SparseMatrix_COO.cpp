@@ -305,6 +305,41 @@ namespace SpMV
     }
 
     /**
+     * @brief Returns a specified value in the matrix
+     *
+     * Defaults to base class, but will override if state is assembled
+     * 
+     * @param i the row index
+     * @param j the column index
+     * 
+     * @return fp_type the value in the matrix
+     *
+     * @pre deferred to base class
+     * @post none
+     */
+    template <class fp_type>
+    fp_type SparseMatrix_COO<fp_type>::getValue(const std::size_t i, const std::size_t j) const noexcept
+    {
+        // Initialize to base class condition for DBC and building,
+        // returns 0.0 if matrix is assembled.
+        fp_type aij = SparseMatrix<fp_type>::getValue(i, j);
+
+        if (this->getState() == MatrixState::assembled)
+        {
+            // Search COO format
+            for (std::size_t n = 0; n < this->getNumnz(); ++n)
+            {
+                if (this->_ia[n] == i && this->_ja[n] == j)
+                {
+                    aij = this->_vals[n];
+                    break;
+                }
+            }
+        }
+        return aij;
+    }
+
+    /**
      * @brief Static function returns the child class matrix type
      * @return `MatrixType::COO`
      */
@@ -330,6 +365,7 @@ namespace SpMV
      * Implements $y \gets Ax$ for $A$ stored in COO format.
      *
      * @param x the vector to multiply with A
+     * @return the vector result of $Ax$
      *
      * @pre matrix is assembled x is not null.
      * @post None
@@ -359,6 +395,7 @@ namespace SpMV
      * Implements $y \gets Ax$ for $A$ stored in COO format.
      *
      * @param x the vector to multiply with A
+     * @return the vector result of $Ax$
      *
      * @pre matrix is assembled x same size as columns of A.
      * @post None
