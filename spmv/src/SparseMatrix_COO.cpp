@@ -193,8 +193,7 @@ namespace SpMV
      */
     template <class fp_type>
     SparseMatrix_COO<fp_type>::SparseMatrix_COO(SparseMatrix_COO&& that) noexcept :
-        SparseMatrix<fp_type>(std::move(that)),
-        _ia(that._ia), _ja(that._ja), _vals(that._vals)
+        SparseMatrix<fp_type>(std::move(that)),_ia(that._ia), _ja(that._ja), _vals(that._vals)
     {
         that._ia = nullptr;
         that._ja = nullptr;
@@ -234,7 +233,7 @@ namespace SpMV
         assert(this->_vals != nullptr);
 
         // Loop over entries in COO arrays and assign to map
-        for (std::size_t n; n < this->getNumnz(); ++n) {
+        for (std::size_t n = 0; n < this->getNumnz(); ++n) {
             auto i   = this->_ia[n];
             auto j   = this->_ja[n];
             fp_type aij = this->_vals[n];
@@ -273,7 +272,7 @@ namespace SpMV
     {
         // DBC pre-conditions
         assert(this->getState() > MatrixState::initialized);
-        assert(this->getNumnz > 0);
+        assert(this->getNumnz() > 0);
 
         // Assemble the matrix if its not assembled
         if(this->getState() == MatrixState::building)
