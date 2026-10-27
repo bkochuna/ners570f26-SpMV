@@ -1,7 +1,7 @@
 #ifndef __SPMV_SparseMatrix__
 #define __SPMV_SparseMatrix__
 
-#include <stddef.h>     //for std::size_t
+#include <cstddef>      //for std::size_t
 #include <map>          //for std::map
 #include <utility>      //for std::pair
 #include <string_view>  //for std::string_view
