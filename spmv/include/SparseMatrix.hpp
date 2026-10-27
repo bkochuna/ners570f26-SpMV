@@ -37,8 +37,8 @@ namespace SpMV
         // "= default" means automagically generate assignments for each attribute
         SparseMatrix(const SparseMatrix& that) = default;                 //Copy
         SparseMatrix& operator=(const SparseMatrix& that) = default;      //Copy assignment
-        SparseMatrix(SparseMatrix&& that) noexcept = default;             //Move
-        SparseMatrix& operator=(SparseMatrix&& that) noexcept = default;  //Move assginment
+        SparseMatrix(SparseMatrix&& that) noexcept;                       //Move
+        SparseMatrix& operator=(SparseMatrix&& that) noexcept;            //Move assginment
 
         // Accessors
         [[nodiscard]] MatrixState     getState()    const noexcept { return _state; } //simple accessors are typically

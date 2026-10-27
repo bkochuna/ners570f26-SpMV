@@ -36,6 +36,41 @@ SparseMatrix<fp_type>::SparseMatrix(const SparseMatrix& that)
 */
 
 template <class fp_type>
+SparseMatrix<fp_type>::SparseMatrix(SparseMatrix&& that) noexcept :
+    _state(that._state),
+    _nrows(that._nrows),
+    _ncols(that._ncols),
+    _numnz(that._numnz),
+    _buildCoeff(std::move(that._buildCoeff))
+{
+    that._state = MatrixState::undefined;
+    that._nrows = 0;
+    that._ncols = 0;
+    that._numnz = 0;
+    that._buildCoeff.clear();
+}
+
+template <class fp_type>
+SparseMatrix<fp_type>& SparseMatrix<fp_type>::operator=(SparseMatrix&& that) noexcept
+{
+    if (this != &that) {
+        this->_state      = that._state;
+        this->_nrows      = that._nrows;
+        this->_ncols      = that._ncols;
+        this->_numnz      = that._numnz;
+        this->_buildCoeff = std::move(that._buildCoeff);
+
+        that._state = MatrixState::undefined;
+        that._nrows = 0;
+        that._ncols = 0;
+        that._numnz = 0;
+        that._buildCoeff.clear();
+    }
+
+    return *this;
+}
+
+template <class fp_type>
 SparseMatrix<fp_type>::~SparseMatrix()
 {
     // These assignments are not required for destruction and must not 
