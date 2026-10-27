@@ -1,7 +1,9 @@
 #include "SparseMatrix_ELL.hpp"
+#include "SparseMatrix.hpp"
 
 #include <iostream>
 #include <stddef.h>
+#include <string_view>
 
 using namespace std;
 

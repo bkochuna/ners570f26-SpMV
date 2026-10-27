@@ -1,6 +1,7 @@
 #ifndef __SPMV_SparseMatrix_ELL__
 #define __SPMV_SparseMatrix_ELL__
 
+#include "string_view"
 #include "SparseMatrix.hpp"
 // #include "SparseMatrix_CSR.hpp"
 
