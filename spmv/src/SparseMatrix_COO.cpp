@@ -216,6 +216,21 @@ namespace SpMV
     }
     
     /**
+     * @brief Converts COO formatted data to base class storage
+     *
+     * Specifically converts `_ia`, `_ja`, and `vals` into the base-class storage
+     *  format defined by `_buildCoeff
+     *
+     * @pre matrix has been built
+     * @post base class storage is restored, state is building
+     */
+    template <class fp_type>
+    void SparseMatrix_COO<fp_type>::_disassemble() noexcept
+    {
+
+    }
+
+    /**
      * @brief Converts matrix data to COO storage format
      *
      * Specifically converts the base-class storage format defined by
