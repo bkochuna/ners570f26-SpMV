@@ -116,8 +116,17 @@ fp_type SparseMatrix<fp_type>::getValue(const std::size_t i, const std::size_t j
     assert(this->_state > MatrixState::initialized);
     assert(i < this->_nrows);
     assert(j < this->_ncols);
+
+    fp_type aij = 0.0;
+    if (this->getState() == MatrixState::building)
+    {
+        auto val = this->_buildCoeff.find(std::make_pair(i,j)); //Check dictionary for (i,j)
+        if (val != this->_buildCoeff.end()) {
+            aij = val->second; //value exists in _buildCoeff set output to value.
+        }
+    }
     
-    return 0.0;
+    return aij;
 }
 
 }
