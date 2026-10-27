@@ -88,16 +88,25 @@ SparseMatrix<fp_type>::~SparseMatrix()
 template <class fp_type>
 void SparseMatrix<fp_type>::setValue(const std::size_t i, const std::size_t j, fp_type val)
 {
+    // DBC pre-conditions
     assert(this->_state >= MatrixState::initialized);
     assert(i < this->_nrows);
     assert(j < this->_ncols);
 
+    // If the matrix has been assembled, disassemble it.
+    if (this->_state == MatrixState::assembled)
+    {
+        this->_disassemble();
+    }
+
+    // Set state to building
     this->_state = MatrixState::building;
 
     //Store value
     this->_buildCoeff[std::make_pair(i,j)] = val;
     this->_numnz = this->_buildCoeff.size();
 
+    // DBC post-conditions
     assert(this->_state == MatrixState::building);
 }
 
