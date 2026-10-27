@@ -242,7 +242,38 @@ namespace SpMV
     template <class fp_type>
     void SparseMatrix_COO<fp_type>::assemble()
     {
+        // DBC pre-conditions
+        assert(this->getState() > MatrixState::initialized);
+        assert(this->getNumnz > 0);
 
+        // Assemble the matrix if its not assembled
+        if(this->getState() == MatrixState::building)
+        {
+            // Allocate the private COO storage arrays
+            this->_ia = new size_t[this->_numnz];
+            this->_ja = new size_t[this->_numnz];
+            this->_vals = new fp_type[this->_numnz];
+
+            // Loop over entries in the map and assign to COO arrays
+            size_t n=0;
+            for (const auto& [ij, aij] : this->_buildCoeff) {
+                const auto& [i,j] = ij;
+                this->_ia[n] = i;
+                this->_ja[n] = j;
+                this->_vals[n] = aij;
+                ++n;
+            }
+
+            // Clear the map
+            this->_buildCoeff.clear();
+        }
+
+        // DBC post-conditions
+        assert(this->getState() == MatrixState::assembled);
+        assert(this->_buildCoeff.empty());
+        assert(this->_ia != nullptr);
+        assert(this->_ja != nullptr);
+        assert(this->_vals != nullptr);
     }
 
     /**
