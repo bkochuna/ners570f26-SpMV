@@ -35,7 +35,7 @@ namespace SpMV
     }
 
     // I used the attributes: nrows, width = max_nnz_per_row, col_indices, and values that I expect to get from the A constructed in ELL format
-    std::vetcor<double> matvec(const SparseMatrix_ELL& A, const std::vector<double>& x) {
+    std::vetcor<double> SparseMatrix_ELL<fp_type>::matvec(const SparseMatrix_ELL& A, const std::vector<double>& x) {
         // declare and initialize output vector y
         std::vector<double> y(A.nrows, 0.0);
 
