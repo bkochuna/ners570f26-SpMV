@@ -20,7 +20,7 @@ namespace SpMV
 
             // Overloaded constructors
             SparseMatrix_COO(const size_t nnz, const size_t* ia, const size_t* ja, const fp_type* vals);
-            SparseMatrix_COO(const vector<size_t>& ia, const vector<size_t>& ja, const vector<fp_type>& vals);
+            SparseMatrix_COO(const std::vector<size_t>& ia, const std::vector<size_t>& ja, const std::vector<fp_type>& vals);
 
             //Copy and Move constructors
             SparseMatrix_COO(const SparseMatrix_COO& other);                 //Copy

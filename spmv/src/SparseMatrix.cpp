@@ -7,7 +7,7 @@ namespace SpMV
 {
 
 template <class fp_type>
-SparseMatrix<fp_type>::SparseMatrix(const size_t nrows, const size_t ncols) :
+SparseMatrix<fp_type>::SparseMatrix(const std::size_t nrows, const std::size_t ncols) :
     _nrows(nrows), _ncols(ncols)
 {
     assert(this->_state == MatrixState::undefined);
@@ -86,7 +86,7 @@ SparseMatrix<fp_type>::~SparseMatrix()
 }
 
 template <class fp_type>
-void SparseMatrix<fp_type>::setValue(const size_t i, const size_t j, fp_type val)
+void SparseMatrix<fp_type>::setValue(const std::size_t i, const std::size_t j, fp_type val)
 {
     assert(this->_state >= MatrixState::initialized);
     assert(i < this->_nrows);
@@ -102,12 +102,12 @@ void SparseMatrix<fp_type>::setValue(const size_t i, const size_t j, fp_type val
 }
 
 template <class fp_type>
-fp_type SparseMatrix<fp_type>::getValue(const size_t i, const size_t j) const noexcept
+fp_type SparseMatrix<fp_type>::getValue(const std::size_t i, const std::size_t j) const noexcept
 {
     assert(this->_state > MatrixState::initialized);
-
-    cout << "i=" << i << endl;
-    cout << "j=" << j << endl;
+    assert(i < this->_nrows);
+    assert(j < this->_ncols);
+    
     return 0.0;
 }
 

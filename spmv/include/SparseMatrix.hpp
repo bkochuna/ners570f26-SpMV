@@ -6,8 +6,6 @@
 #include <utility>      //for std::pair
 #include <string_view>  //for std::string_view
 
-using namespace std;
-
 namespace SpMV
 {
 
@@ -17,15 +15,15 @@ namespace SpMV
     template <class fp_type>
     class SparseMatrix
     {
-    using key_type = pair<size_t, size_t>;
-    using CoeffMap = map<key_type, fp_type>;  // Essentially defines an alias. Similar to a C typedef
+    using key_type = std::pair<std::size_t, std::size_t>;
+    using CoeffMap = std::map<key_type, fp_type>;  // Essentially defines an alias. Similar to a C typedef
 
 
     protected:
         MatrixState _state = MatrixState::undefined;
-             size_t _nrows = 0;
-             size_t _ncols = 0;
-             size_t _numnz = 0;
+        std::size_t _nrows = 0;
+        std::size_t _ncols = 0;
+        std::size_t _numnz = 0;
            CoeffMap _buildCoeff;
         
     public:
@@ -42,21 +40,21 @@ namespace SpMV
 
         // Accessors
         [[nodiscard]] MatrixState     getState()    const noexcept { return _state; } //simple accessors are typically
-        [[nodiscard]] size_t          getNrows()    const noexcept { return _nrows; } //written fully in header
-        [[nodiscard]] size_t          getNcols()    const noexcept { return _ncols; }
-        [[nodiscard]] size_t          getNumnz()    const noexcept { return _numnz; }
+        [[nodiscard]] std::size_t     getNrows()    const noexcept { return _nrows; } //written fully in header
+        [[nodiscard]] std::size_t     getNcols()    const noexcept { return _ncols; }
+        [[nodiscard]] std::size_t     getNumnz()    const noexcept { return _numnz; }
         [[nodiscard]] const CoeffMap& getCoeffMap() const noexcept { return _buildCoeff; }
         // ^          ^             ^ means this method returns a reference to _buildCoeff
         // |          |  means the reference that is returned is read only
         // | will generate a compiler warning if the method is used and the return arg is not used.
  
-                      void    setValue(const size_t i, const size_t j, fp_type val);
-        [[nodiscard]] fp_type getValue(const size_t i, const size_t j) const noexcept;
+                      void    setValue(const std::size_t i, const std::size_t j, fp_type val);
+        [[nodiscard]] fp_type getValue(const std::size_t i, const std::size_t j) const noexcept;
 
         // Abstract methods
-        virtual void         assemble()                   =0; // The "=0" defines this class as abstract
-        virtual MatrixType   getFormat()   const noexcept =0; // const means "this" cannot be modified except for mutable members
-        virtual string_view  printFormat() const noexcept =0; // noexcept means it does not throw any exceptions
+        virtual void              assemble()                   =0; // The "=0" defines this class as abstract
+        virtual MatrixType        getFormat()   const noexcept =0; // const means "this" cannot be modified except for mutable members
+        virtual std::string_view  printFormat() const noexcept =0; // noexcept means it does not throw any exceptions
     };
 }
 

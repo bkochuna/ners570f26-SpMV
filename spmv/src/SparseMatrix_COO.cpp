@@ -22,7 +22,7 @@ namespace SpMV
      * @post deferred to base class
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nrows, const size_t ncols) : 
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const std::size_t nrows, const std::size_t ncols) : 
         SparseMatrix<fp_type>(nrows,ncols) {/* base class constructor only*/}
 
     /**
@@ -40,7 +40,7 @@ namespace SpMV
      * @post constructed object owns copies of dummy arg arrays. State is assembled.
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nnz, const size_t* ia, const size_t* ja, const fp_type* vals) : 
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const std::size_t nnz, const std::size_t* ia, const std::size_t* ja, const fp_type* vals) : 
         SparseMatrix<fp_type>(1,1)
     {
         // DBC REQUIRE assertions on input args
@@ -51,8 +51,8 @@ namespace SpMV
 
         this->_numnz = nnz;
         // Allocate
-        this->_ia = new size_t[nnz];
-        this->_ja = new size_t[nnz];
+        this->_ia = new std::size_t[nnz];
+        this->_ja = new std::size_t[nnz];
         this->_vals = new fp_type[nnz];
         // Copy
         copy_n(ia,this->_numnz,this->_ia);
@@ -87,7 +87,7 @@ namespace SpMV
      * @post constructed object owns copies of dummy arg arrays. State is assembled.
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const vector<size_t>& ia, const vector<size_t>& ja, const vector<fp_type>& vals) :
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const std::vector<size_t>& ia, const std::vector<size_t>& ja, const std::vector<fp_type>& vals) :
         SparseMatrix<fp_type>(1,1)
     {
         // DBC REQUIRE assertions on input args
@@ -98,8 +98,8 @@ namespace SpMV
         this->_numnz = ia.size();
         
         // Allocate
-        this->_ia = new size_t[this->_numnz];
-        this->_ja = new size_t[this->_numnz];
+        this->_ia = new std::size_t[this->_numnz];
+        this->_ja = new std::size_t[this->_numnz];
         this->_vals = new fp_type[this->_numnz];
 
         // Copy
