@@ -122,38 +122,25 @@ namespace SpMV
      *
      * Creates a `SparseMatrix_COO` by deep-copying another `SparseMatrix_COO`
      *
-     * @param other the matrix to copy
+     * @param that the matrix to copy
      *
      * @pre the other matrix exists
      * @post two matrices are equal (TBD -- need to overload == operator)
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const SparseMatrix_COO& other) :
-        SparseMatrix<fp_type>(1,1)
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const SparseMatrix_COO& that) :
+        SparseMatrix<fp_type>(that)
     {
-        assert(other.getState() != MatrixState::undefined);
-        this->_state = other._state;
-
-        if(other.getState() >= MatrixState::initialized) {
-            this->_nrows = other._nrows;
-            this->_ncols = other._ncols;
-        }
-
-        if(other.getState() >= MatrixState::building) {
-            this->_numnz = other._numnz;
-            this->_buildCoeff = other._buildCoeff;
-        }
-
-        if(other.getState() >= MatrixState::assembled) {
-            this->_numnz = other._numnz;
+        if(that.getState() >= MatrixState::assembled) {
+            this->_numnz = that._numnz;
             // Allocate
             this->_ia = new size_t[this->_numnz];
             this->_ja = new size_t[this->_numnz];
             this->_vals = new fp_type[this->_numnz];
              // Copy
-            copy_n(other._ia,this->_numnz,this->_ia);
-            copy_n(other._ja,this->_numnz,this->_ja);
-            copy_n(other._vals,this->_numnz,this->_vals);
+            copy_n(that._ia,this->_numnz,this->_ia);
+            copy_n(that._ja,this->_numnz,this->_ja);
+            copy_n(that._vals,this->_numnz,this->_vals);
         }
         
     }
@@ -163,7 +150,7 @@ namespace SpMV
      *
      * Performs a deep-copy during assignment with `A = B`
      * 
-     * @param other the LHS matrix to copy
+     * @param that the LHS matrix to copy
      *
      * @return a copy of the RHS Sparse Matrix
      *
@@ -171,14 +158,14 @@ namespace SpMV
      * @post TBD
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>& SparseMatrix_COO<fp_type>::operator=(const SparseMatrix_COO<fp_type>& other)
+    SparseMatrix_COO<fp_type>& SparseMatrix_COO<fp_type>::operator=(const SparseMatrix_COO<fp_type>& that)
     {
-        if(this == &other) {
+        if(this == &that) {
             return *this;
         }
         
         // Create a local copy
-        SparseMatrix_COO a_copy(other);
+        SparseMatrix_COO a_copy(that);
         
         // Swap the base-class state.
         swap(this->_nrows, a_copy._nrows);
@@ -191,6 +178,29 @@ namespace SpMV
         return *this;
     }
     
+    /**
+     * @brief Move constructor
+     *
+     * Transfers ownership of data in `that` to `this`.
+     * e.g., `SparseMatrix_COO b(std::move(a));`
+     * 
+     * @param that the LHS matrix to copy
+     *
+     * @return a copy of the RHS Sparse Matrix
+     *
+     * @pre TBD
+     * @post TBD
+     */
+    template <class fp_type>
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(SparseMatrix_COO&& that) noexcept :
+        SparseMatrix<fp_type>(std::move(that)),
+        _ia(that._ia), _ja(that._ja), _vals(that._vals)
+    {
+        that._ia = nullptr;
+        that._ja = nullptr;
+        that._vals = nullptr;
+    }
+
     /**
      * @brief COO Destructor
      *
