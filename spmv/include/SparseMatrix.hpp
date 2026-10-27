@@ -46,8 +46,8 @@ namespace SpMV
         [[nodiscard]] size_t          getNcols()    const noexcept { return _ncols; }
         [[nodiscard]] size_t          getNumnz()    const noexcept { return _numnz; }
         [[nodiscard]] const CoeffMap& getCoeffMap() const noexcept { return _buildCoeff; }
-        // ^          ^             ^ means this method returns a pointer to _buildCoeff
-        // |          |  means the pointer that is returned is read only
+        // ^          ^             ^ means this method returns a reference to _buildCoeff
+        // |          |  means the reference that is returned is read only
         // | will generate a compiler warning if the method is used and the return arg is not used.
  
                       void    setValue(const size_t i, const size_t j, fp_type val);

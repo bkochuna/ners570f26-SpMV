@@ -27,7 +27,7 @@ SparseMatrix<fp_type>::SparseMatrix(const SparseMatrix& that)
       _nrows(that._nrows),
       _ncols(that._ncols),
       _numnz(that._numnz),
-      _buildCoeff(that._numnz)
+      _buildCoeff(that._buildCoeff)
 {
       // Nothing to do in the body
 }
@@ -38,11 +38,16 @@ SparseMatrix<fp_type>::SparseMatrix(const SparseMatrix& that)
 template <class fp_type>
 SparseMatrix<fp_type>::~SparseMatrix()
 {
+    // These assignments are not required for destruction and must not 
+    // be relied upon to sanitize memory or make access after destruction valid.
+    //
+    // The preferred definition would be `virtual ~SparseMatrix() = default;`
+    //
     this->_state = MatrixState::undefined;
     this->_nrows = 0;
     this->_ncols = 0;
     this->_numnz = 0;
-    //Destructor for _buildCoeff called implicitly.
+    // Destructor for _buildCoeff called implicitly.
 }
 
 template <class fp_type>
