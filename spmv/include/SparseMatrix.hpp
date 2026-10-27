@@ -43,7 +43,8 @@ namespace SpMV
         // | will generate a compiler warning if the method is used and the return arg is not used.
  
                       void    setValue(const size_t i, const size_t j, fp_type val);
-        [[nodiscard]] fp_type getValue(const size_t i, const size_t j) const noexcept;
+		// Added virtual so can access CSR  instead of base getValue(). Consistent with DEN group for easy merge.
+        [[nodiscard]] virtual fp_type getValue(const size_t i, const size_t j) const noexcept;
 
         // Abstract methods
         virtual void         assemble()                   =0; // The "=0" defines this class as abstract
