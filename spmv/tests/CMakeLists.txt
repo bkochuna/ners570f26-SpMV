@@ -5,3 +5,4 @@ spmv_add_test(./csr_basic_test.cpp) # class construction test
 spmv_add_test(./csr_matvec_test.cpp)
 spmv_add_test(./csr_accessor_test.cpp) # accessing accessor test 
 spmv_add_test(./csr_view_test.cpp) # view test
+spmv_add_test(./csr_assemble_test.cpp) # assembly tests
