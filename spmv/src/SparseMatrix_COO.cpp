@@ -340,7 +340,7 @@ namespace SpMV
     }
 
     /**
-     * @brief Returns COO arrays as a tuple
+     * @brief Returns COO arrays as a tuple of pointers
      * 
      * @return tuple of const pointers
      *
@@ -359,6 +359,32 @@ namespace SpMV
         assert(this->_vals == nullptr);
 
         return {this->_ia, this->_ja, this->_vals};
+    }
+
+    /**
+     * @brief Returns copies of COO arrays as a tuple of vectors
+     * 
+     * @return tuple of vectors
+     *
+     * @pre Matrix is assembled
+     * @post pointers are not null
+     */
+    template <class fp_type>
+    std::tuple<std::vector<std::size_t>, std::vector<std::size_t>, std::vector<fp_type>> SparseMatrix_COO<fp_type>::copyCOOArrays() const noexcept
+    {
+        // Pre conditions
+        assert(this->getState() == MatrixState::assembled);
+
+        // Post conditions
+        assert(this->_ia == nullptr);
+        assert(this->_ja == nullptr);
+        assert(this->_vals == nullptr);
+
+        return {
+            std::vector<std::size_t>(this->_ia, this->_ia + this->getNumnz()),
+            std::vector<std::size_t>(this->_ja, this->_ja + this->getNumnz()),
+            std::vector<fp_type>(this->_vals, this->_vals + this->getNumnz())
+        };
     }
 
     /**
