@@ -340,6 +340,28 @@ namespace SpMV
     }
 
     /**
+     * @brief Returns COO arrays as a tuple
+     * 
+     * @return tuple of const pointers
+     *
+     * @pre Matrix is assembled
+     * @post pointers are not null
+     */
+    template <class fp_type>
+    std::tuple<const std::size_t*, const std::size_t*, const fp_type*> SparseMatrix_COO<fp_type>::getCOOArrays() const noexcept
+    {
+        // Pre conditions
+        assert(this->getState() == MatrixState::assembled);
+
+        // Post conditions
+        assert(this->_ia == nullptr);
+        assert(this->_ja == nullptr);
+        assert(this->_vals == nullptr);
+
+        return {this->_ia, this->_ja, this->_vals};
+    }
+
+    /**
      * @brief Static function returns the child class matrix type
      * @return `MatrixType::COO`
      */

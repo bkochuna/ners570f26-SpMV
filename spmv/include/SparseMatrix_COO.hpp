@@ -36,6 +36,8 @@ namespace SpMV
             MatrixType            getFormat()   const noexcept override;
             std::string_view      printFormat() const noexcept override;
             [[nodiscard]] fp_type getValue(const std::size_t i, const std::size_t j) const noexcept override;
+            [[nodiscard]] std::tuple<const std::size_t*, const std::size_t*, const fp_type*> getCOOArrays() const noexcept;
+            // return all arrays in a tuple. Each array is returned as a const pointer meaning its calues cannot be changed
 
             void assemble();
 
