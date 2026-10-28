@@ -10,6 +10,9 @@ using namespace std;
 
 namespace SpMV
 {
+
+    using namespace std;
+
     /**
      * @brief Constructs SparseMatrix_COO with default constructor
      *
@@ -22,7 +25,7 @@ namespace SpMV
      * @post deferred to base class
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const std::size_t nrows, const std::size_t ncols) : 
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nrows, const size_t ncols) : 
         SparseMatrix<fp_type>(nrows,ncols) {/* base class constructor only*/}
 
     /**
@@ -40,7 +43,7 @@ namespace SpMV
      * @post constructed object owns copies of dummy arg arrays. State is assembled.
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const std::size_t nnz, const std::size_t* ia, const std::size_t* ja, const fp_type* vals) : 
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const size_t nnz, const size_t* ia, const size_t* ja, const fp_type* vals) : 
         SparseMatrix<fp_type>(1,1)
     {
         // DBC REQUIRE assertions on input args
@@ -51,8 +54,8 @@ namespace SpMV
 
         this->_numnz = nnz;
         // Allocate
-        this->_ia = new std::size_t[nnz];
-        this->_ja = new std::size_t[nnz];
+        this->_ia = new size_t[nnz];
+        this->_ja = new size_t[nnz];
         this->_vals = new fp_type[nnz];
         // Copy
         copy_n(ia,this->_numnz,this->_ia);
@@ -87,7 +90,7 @@ namespace SpMV
      * @post constructed object owns copies of dummy arg arrays. State is assembled.
      */
     template <class fp_type>
-    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const std::vector<size_t>& ia, const std::vector<size_t>& ja, const std::vector<fp_type>& vals) :
+    SparseMatrix_COO<fp_type>::SparseMatrix_COO(const vector<size_t>& ia, const vector<size_t>& ja, const vector<fp_type>& vals) :
         SparseMatrix<fp_type>(1,1)
     {
         // DBC REQUIRE assertions on input args
@@ -98,8 +101,8 @@ namespace SpMV
         this->_numnz = ia.size();
         
         // Allocate
-        this->_ia = new std::size_t[this->_numnz];
-        this->_ja = new std::size_t[this->_numnz];
+        this->_ia = new size_t[this->_numnz];
+        this->_ja = new size_t[this->_numnz];
         this->_vals = new fp_type[this->_numnz];
 
         // Copy
@@ -182,7 +185,7 @@ namespace SpMV
      * @brief Move constructor
      *
      * Transfers ownership of data in `that` to `this`.
-     * e.g., `SparseMatrix_COO b(std::move(a));`
+     * e.g., `SparseMatrix_COO b(move(a));`
      * 
      * @param that the LHS matrix to copy
      *
@@ -193,7 +196,7 @@ namespace SpMV
      */
     template <class fp_type>
     SparseMatrix_COO<fp_type>::SparseMatrix_COO(SparseMatrix_COO&& that) noexcept :
-        SparseMatrix<fp_type>(std::move(that)),_ia(that._ia), _ja(that._ja), _vals(that._vals)
+        SparseMatrix<fp_type>(move(that)),_ia(that._ia), _ja(that._ja), _vals(that._vals)
     {
         that._ia = nullptr;
         that._ja = nullptr;
@@ -233,11 +236,11 @@ namespace SpMV
         assert(this->_vals != nullptr);
 
         // Loop over entries in COO arrays and assign to map
-        for (std::size_t n = 0; n < this->getNumnz(); ++n) {
+        for (size_t n = 0; n < this->getNumnz(); ++n) {
             auto i   = this->_ia[n];
             auto j   = this->_ja[n];
             fp_type aij = this->_vals[n];
-            this->_buildCoeff[std::make_pair(i,j)] = aij;
+            this->_buildCoeff[make_pair(i,j)] = aij;
         }
 
         // Deallocate the private COO storage arrays and set pointers to null.
@@ -318,7 +321,7 @@ namespace SpMV
      * @post none
      */
     template <class fp_type>
-    fp_type SparseMatrix_COO<fp_type>::getValue(const std::size_t i, const std::size_t j) const noexcept
+    fp_type SparseMatrix_COO<fp_type>::getValue(const size_t i, const size_t j) const noexcept
     {
         // Initialize to base class condition for DBC and building,
         // returns 0.0 if matrix is assembled.
@@ -327,7 +330,7 @@ namespace SpMV
         if (this->getState() == MatrixState::assembled)
         {
             // Search COO format
-            for (std::size_t n = 0; n < this->getNumnz(); ++n)
+            for (size_t n = 0; n < this->getNumnz(); ++n)
             {
                 if (this->_ia[n] == i && this->_ja[n] == j)
                 {
@@ -348,7 +351,7 @@ namespace SpMV
      * @post pointers are not null
      */
     template <class fp_type>
-    std::tuple<const std::size_t*, const std::size_t*, const fp_type*> SparseMatrix_COO<fp_type>::getCOOArrays() const noexcept
+    tuple<const size_t*, const size_t*, const fp_type*> SparseMatrix_COO<fp_type>::getCOOArrays() const noexcept
     {
         // Pre conditions
         assert(this->getState() == MatrixState::assembled);
@@ -370,7 +373,7 @@ namespace SpMV
      * @post pointers are not null
      */
     template <class fp_type>
-    std::tuple<std::vector<std::size_t>, std::vector<std::size_t>, std::vector<fp_type>> SparseMatrix_COO<fp_type>::copyCOOArrays() const noexcept
+    tuple<vector<size_t>, vector<size_t>, vector<fp_type>> SparseMatrix_COO<fp_type>::copyCOOArrays() const noexcept
     {
         // Pre conditions
         assert(this->getState() == MatrixState::assembled);
@@ -381,9 +384,9 @@ namespace SpMV
         assert(this->_vals == nullptr);
 
         return {
-            std::vector<std::size_t>(this->_ia, this->_ia + this->getNumnz()),
-            std::vector<std::size_t>(this->_ja, this->_ja + this->getNumnz()),
-            std::vector<fp_type>(this->_vals, this->_vals + this->getNumnz())
+            vector<size_t>(this->_ia, this->_ia + this->getNumnz()),
+            vector<size_t>(this->_ja, this->_ja + this->getNumnz()),
+            vector<fp_type>(this->_vals, this->_vals + this->getNumnz())
         };
     }
 
@@ -399,10 +402,10 @@ namespace SpMV
 
     /**
      * @brief Static function returns child class matrix type as a string
-     * @return "COO" as a `std::string_view`
+     * @return "COO" as a `string_view`
      */
     template <class fp_type>
-    std::string_view SparseMatrix_COO<fp_type>::printFormat() const noexcept
+    string_view SparseMatrix_COO<fp_type>::printFormat() const noexcept
     {
         return "COO";
     }
@@ -425,7 +428,7 @@ namespace SpMV
         assert(x != nullptr);
 
         fp_type* y = new fp_type[this->_nrows]{};
-        for(std::size_t n = 0; n < this->getNumnz(); ++n)
+        for(size_t n = 0; n < this->getNumnz(); ++n)
         {
             auto i   = this->_ia[n];
             auto j   = this->_ja[n];
@@ -449,13 +452,13 @@ namespace SpMV
      * @post None
      */
     template <class fp_type>
-    std::vector<fp_type> SparseMatrix_COO<fp_type>::matvec(const std::vector<fp_type> x) const noexcept
+    vector<fp_type> SparseMatrix_COO<fp_type>::matvec(const vector<fp_type> x) const noexcept
     {
         assert(this->getState() == MatrixState::assembled);
         assert(x.size() == this->getNcols());
 
-        std::vector<fp_type> y(this->getNrows(),0.0);
-        for(std::size_t n = 0 ; n < this->getNumnz(); ++n)
+        vector<fp_type> y(this->getNrows(),0.0);
+        for(size_t n = 0 ; n < this->getNumnz(); ++n)
         {
             auto i   = this->_ia[n];
             auto j   = this->_ja[n];
