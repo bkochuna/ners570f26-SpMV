@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <type_traits>
 
 // Include the testing framework after all other headers.
 #include "unit_test_framework.hpp"
@@ -155,6 +156,24 @@ TEST_CASE(identity_values)
     }
 }
 
+// Check row pointer and column indices are datatype int or unsigned int
+// Check that values have a numerical type
+template <typename T>
+TEST_CASE(storage_types)
+{
+    SpMV::SparseMatrix_CSR<T> matrix(3, 4);
+
+    using RowPtrT = std::remove_cv_t<std::remove_pointer_t<decltype(matrix.getRowPtr())>>;
+    using ColIdxT = std::remove_cv_t<std::remove_pointer_t<decltype(matrix.getColIdx())>>;
+    using ValT    = std::remove_cv_t<std::remove_pointer_t<decltype(matrix.getValues())>>;
+
+    static_assert(std::is_integral_v<RowPtrT>,  "rowPtr must be an integer type");
+    static_assert(std::is_integral_v<ColIdxT>,  "colIdx must be an integer type");
+    static_assert(std::is_arithmetic_v<ValT>,   "values must be a numeric type");
+
+    ASSERT(true);
+}
+
 // Run all tests
 template <typename T>
 TEST_SUITE(csr_assembly_suite)
@@ -166,6 +185,7 @@ TEST_SUITE(csr_assembly_suite)
     TEST(identity_rowptr<T>);
     TEST(identity_col_idx<T>);
     TEST(identity_values<T>);
+    TEST(storage_types<T>);
 }
 
 auto main() -> int
