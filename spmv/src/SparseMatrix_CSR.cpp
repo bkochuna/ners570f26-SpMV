@@ -210,6 +210,7 @@ namespace SpMV
         vector<fp_type> in { vec };
         vector<fp_type> out ( this->_nrows );
 
+	// Perform matvec operation for CSR format
         for (size_t n = 0; n < nmults; n++) {
             for (size_t i = 0; i < this->_nrows; i++) {
                 fp_type sum { 0 };
