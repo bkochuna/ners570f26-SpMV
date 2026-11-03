@@ -13,30 +13,27 @@ namespace SpMV
     {
     public:
         SparseMatrix_JDS(const size_t nrows, const size_t ncols);
-        void assemble();
-        void disassemble(); // added for disassembly
-        void view(std::ostream& out = std::cout) const;
+        void assemble(); // Assembly: takes the matrix in its original format and assembles it into the JDS storage format
+        void disassemble(); // Disassembly: takes the matrix in the JDS storage format and returns it back to original format
+        void view(std::ostream& out = std::cout) const; // View: displays matrix in the JDS storage format arrays along with some other matrix attributes (dimensions,number of nonzeros)
 
-        MatrixType getFormat() const noexcept override;
-        std::string_view printFormat() const noexcept override;
+        MatrixType getFormat() const noexcept override; // Get Format: Returns the matrix storage type we are using
+        std::string_view printFormat() const noexcept override; // Print format: prints the matrix storage type format as a string
 
-        void setValue(const size_t i, const size_t j, fp_type val); // Setter for the JDS matrix. Takes in inputs and stores them.
+        void setValue(const size_t i, const size_t j, fp_type val); // Set Value: Setter for the JDS matrix. Takes in indices and value as inputs and stores them in matrix.
         
         [[nodiscard]] // Warning if the return value is not used
-        fp_type getValue(const size_t i, const size_t j) const noexcept; // Getter for the JDS matrix. Takes in inputs and returns the value at that location.
+        fp_type getValue(const size_t i, const size_t j) const noexcept; // Get Value: Getter for the JDS matrix. Takes in inputs and returns the value at that location.
 
-        vector<fp_type> matvec(vector<fp_type> vecin, size_t nmults=1); // set nmults=1 by default in case the user is lazy
+        vector<fp_type> matvec(vector<fp_type> vecin, size_t nmults=1); // Matrix-_Vector Multiplication: Performs matvec given some input vector (set nmults=1 by default in case the user is lazy)
 
-        //friend class JDSSparseMatrixTestFixture; // included to be able to inpendently test set and get accessor methods, commented because not sure if this needed and do not totally understand how to do this
-
-
-    protected:
-        size_t max_row_size; // size of row with maximum number of non-zeros in matrix
-        vector<size_t> row_map; 
-        vector<size_t> row_srt_idx; // row indices sorted
-        vector<size_t> col_idx; // column index of each entry in value array
-        vector<size_t> iter_ptr; // array of indices for col_idx corresponding to each entry from the longest non-zero row of the matrix 
-        vector<fp_type> value; //matrix values
+    private:
+        size_t _max_row_size; // size of row with maximum number of non-zeros in matrix
+        vector<size_t> _row_map; // Row indices original -> sorted; the value at each index is the position that the original row of that index is at after being sorted (ordered by decreasing nonzeros)
+        vector<size_t> _row_srt_idx; // Row indices sorted -> original; tells you which original row is in each position (ordered by decreasing nonzeros)
+        vector<size_t> _col_idx; // column index of each entry in value array
+        vector<size_t> _iter_ptr; // array of indices for col_idx corresponding to each entry from the longest non-zero row of the matrix 
+        vector<fp_type> _value; //matrix values
     };
 }
 #endif

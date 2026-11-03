@@ -1,6 +1,4 @@
 #include "SparseMatrix_JDS.hpp"
-
-#include "SparseMatrix_JDS.hpp"
 #include <iostream>
 #include <stddef.h>
 #include <vector>
@@ -10,12 +8,14 @@
 
 using namespace std;
 namespace SpMV
-{
+{    
+     // Constructs SparseMatrix_JDS with default constructor; Only calls base-class (SparseMatrix) constructor
+     // Inputs: nrows -> number of rows in matrix, ncols -> number of columns in matrix
     template <class fp_type>
     SparseMatrix_JDS<fp_type>::SparseMatrix_JDS(const size_t nrows, const size_t ncols) : 
     SparseMatrix<fp_type>::SparseMatrix(nrows, ncols)
     {
-        cout << "Hello from JDS Constructor" << endl;
+        //cout << "Hello from JDS Constructor" << endl; uncomment if debugging
     }
 
     template <class fp_type>
@@ -47,39 +47,39 @@ namespace SpMV
 
         // ===== Now convert from COO to JDS =====
         // Sort with an index array by row size
-        this->row_srt_idx.resize(this->_nrows);
-        iota(this->row_srt_idx.begin(), this->row_srt_idx.end(), 0);
-        sort(this->row_srt_idx.begin(), this->row_srt_idx.end(), [&](size_t a, size_t b)
+        this->_row_srt_idx.resize(this->_nrows);
+        iota(this->_row_srt_idx.begin(), this->_row_srt_idx.end(), 0);
+        sort(this->_row_srt_idx.begin(), this->_row_srt_idx.end(), [&](size_t a, size_t b)
              { return row_counts[a] > row_counts[b]; });
-        max_row_size = (this->_nrows > 0) ? row_counts[this->row_srt_idx[0]] : 0;
+        _max_row_size = (this->_nrows > 0) ? row_counts[this->_row_srt_idx[0]] : 0;
 
         // Now initialize the memory for the working member arrays
-        iter_ptr.assign(max_row_size + 1, 0);
-        row_map.resize(this->_nrows);
-        col_idx.resize(this->_numnz);
-        value.resize(this->_numnz);
+        _iter_ptr.assign(_max_row_size + 1, 0);
+        _row_map.resize(this->_nrows);
+        _col_idx.resize(this->_numnz);
+        _value.resize(this->_numnz);
 
         // Load the map now
         for (size_t i = 0; i < this->_nrows; i++)
-            row_map[this->row_srt_idx[i]] = i;
+            _row_map[this->_row_srt_idx[i]] = i;
 
         // Load iteration pointer with column size
         for (size_t i = 0; i < this->_nrows; i++)
             for (size_t j = 0; j < row_counts[i]; j++)
-                iter_ptr[j + 1]++;
+                _iter_ptr[j + 1]++;
 
         // Convert the column sizes to a prefix sum
-        for (size_t i = 1; i <= max_row_size; i++)
-            iter_ptr[i] += iter_ptr[i - 1];
+        for (size_t i = 1; i <= _max_row_size; i++)
+            _iter_ptr[i] += _iter_ptr[i - 1];
 
         // Perform the main load now
         for (size_t i = 0; i < this->_numnz; i++)
         {
-            size_t new_row = row_map[temp_row_idx[i]];
-            size_t new_offset = iter_ptr[col_tracker[new_row]] + new_row;
+            size_t new_row = _row_map[temp_row_idx[i]];
+            size_t new_offset = _iter_ptr[col_tracker[new_row]] + new_row;
             col_tracker[new_row]++;
-            col_idx[new_offset] = temp_col_idx[i];
-            value[new_offset] = temp_val_arr[i];
+            _col_idx[new_offset] = temp_col_idx[i];
+            _value[new_offset] = temp_val_arr[i];
         }
 
         this->_buildCoeff.clear();
@@ -95,21 +95,21 @@ namespace SpMV
 
     this->_buildCoeff.clear();
 
-    for (size_t i = 0; i < max_row_size; i++)
+    for (size_t i = 0; i < _max_row_size; i++)
     {
-        for (size_t j = iter_ptr[i]; j < iter_ptr[i + 1]; j++)
+        for (size_t j = _iter_ptr[i]; j < _iter_ptr[i + 1]; j++)
         {
-            size_t orig_row = this->row_srt_idx[j - iter_ptr[i]];
-            size_t orig_col = col_idx[j];
-            fp_type val = value[j];
+            size_t orig_row = this->_row_srt_idx[j - _iter_ptr[i]];
+            size_t orig_col = _col_idx[j];
+            fp_type val = _value[j];
             this->_buildCoeff[{orig_row, orig_col}] = val;
         }
     }
-    row_map.clear();
-    row_srt_idx.clear();
-    col_idx.clear();
-    iter_ptr.clear();
-    value.clear();
+    _row_map.clear();
+    _row_srt_idx.clear();
+    _col_idx.clear();
+    _iter_ptr.clear();
+    _value.clear();
 
     this->_state = MatrixState::building;
     }
@@ -136,27 +136,27 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
     out << "State: assembled\n";
 
     out << "row_srt_idx (sorted to original):";
-    for (const auto index : this->row_srt_idx)
+    for (const auto index : this->_row_srt_idx)
         out << ' ' << index;
     out << '\n';
 
     out << "row_map (original to sorted):";
-    for (const auto index : this->row_map)
+    for (const auto index : this->_row_map)
         out << ' ' << index;
     out << '\n';
 
     out << "iter_ptr:";
-    for (const auto index : this->iter_ptr)
+    for (const auto index : this->_iter_ptr)
         out << ' ' << index;
     out << '\n';
 
     out << "col_idx:";
-    for (const auto index : this->col_idx)
+    for (const auto index : this->_col_idx)
         out << ' ' << index;
     out << '\n';
 
     out << "value:";
-    for (const auto entry : this->value)
+    for (const auto entry : this->_value)
         out << ' ' << entry;
     out << '\n';
 }
@@ -193,12 +193,12 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
         }
         
         // If the matrix is assembled, convert the original row index to the sorted row position in JDS storage
-        const size_t sorted_row = this->row_map[i];
+        const size_t sorted_row = this->_row_map[i];
         // Search through each jagged diagonal to find requested entry
-        for (size_t k=0; k < this->max_row_size; ++k)
+        for (size_t k=0; k < this->_max_row_size; ++k)
         {
             // Calculate number of entries stored in diagonal k
-            const size_t nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
+            const size_t nrows_chunk = this->_iter_ptr[k+1] - this->_iter_ptr[k];
 
             // If the sorted row index is greater than or equal to the number of rows in this diagonal, continue to the next diagonal
             if (sorted_row >= nrows_chunk)
@@ -206,10 +206,10 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
                 continue;
             }
             // Calculate the index in the flattened JDS arrays for the requested entry
-            const size_t idx = this->iter_ptr[k] + sorted_row;
-            if (this->col_idx[idx] == j)
+            const size_t idx = this->_iter_ptr[k] + sorted_row;
+            if (this->_col_idx[idx] == j)
             {
-                return this->value[idx];
+                return this->_value[idx];
             }
         }
 
@@ -261,23 +261,23 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
         // loop through desired number of multiplications
         for (size_t n = 0; n < nmults; n++)
         {
-            // loop through iter_ptr array; max_row_size may be zero, but that's okay
-            for (size_t k = 0; k < this->max_row_size; k++)
+            // loop through _iter_ptr array; _max_row_size may be zero, but that's okay
+            for (size_t k = 0; k < this->_max_row_size; k++)
             {
                 // get starting index of largest row
-                l_idx = this->iter_ptr[k];
+                l_idx = this->_iter_ptr[k];
                 // get number of rows before next column
-                nrows_chunk = this->iter_ptr[k+1] - this->iter_ptr[k];
+                nrows_chunk = this->_iter_ptr[k+1] - this->_iter_ptr[k];
                 
                 // iterate over rows in this chunk of the array
                 for (size_t t = 0; t < nrows_chunk; t++)
                 {
                     // get row index
-                    i = this->row_srt_idx[t];
+                    i = this->_row_srt_idx[t];
                     // get column index
-                    j = this->col_idx[l_idx+t];
+                    j = this->_col_idx[l_idx+t];
                     // do the multiplication
-                    vecout[i] = vecout[i] + this->value[l_idx+t]*vecin_temp[j];
+                    vecout[i] = vecout[i] + this->_value[l_idx+t]*vecin_temp[j];
                 }
             }
             // if we're not on the last iteration
