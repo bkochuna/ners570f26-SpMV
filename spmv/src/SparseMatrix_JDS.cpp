@@ -161,12 +161,14 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
     out << '\n';
 }
     template <class fp_type>
+    // Function to get the format of the storage type 
     MatrixType SparseMatrix_JDS<fp_type>::getFormat() const noexcept
     {
         return MatrixType::JDS;
     }
 
     template <class fp_type>
+    // Function to print the format of the storage type as a string
     std::string_view SparseMatrix_JDS<fp_type>::printFormat() const noexcept
     {
         return "JDS";
