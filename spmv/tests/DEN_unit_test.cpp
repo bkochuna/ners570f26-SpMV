@@ -1,6 +1,7 @@
 
 #include "SpMV.hpp"
 
+#include <iostream> // std::cout
 #include <sstream> // std::ostringstream, std::istringstream
 #include <string>  // std::string, std::stod
 #include <vector>  // std::vector
@@ -80,6 +81,19 @@ static bool printsAllEntries(const SpMV::SparseMatrix_DEN<T>& A, const std::stri
     return false;
 }
 
+// Run A.view() and return everything it printed to std::cout as a string.
+// view() writes straight to std::cout, so we temporarily point std::cout at a
+// string buffer while it runs and then restore it.
+template <typename T>
+static std::string captureView(const SpMV::SparseMatrix_DEN<T>& A)
+{
+    std::ostringstream out;
+    std::streambuf* const original = std::cout.rdbuf(out.rdbuf());
+    A.view();
+    std::cout.rdbuf(original);
+    return out.str();
+}
+
 // Activity 1a: a 3x3 matrix with some zero entries prints every value,
 // including the zeros, in the right order.
 template <typename T>
@@ -92,9 +106,7 @@ TEST_CASE(view_square_with_zeros)
     A.setValue(2, 2, static_cast<T>(4.125));
     A.assemble();
 
-    std::ostringstream out;
-    A.view(out);
-    const std::string text = out.str();
+    const std::string text = captureView(A);
 
     ASSERT(!text.empty());
     ASSERT(printsAllEntries(A, text));
@@ -114,9 +126,7 @@ TEST_CASE(view_non_square)
     A.setValue(1, 2, static_cast<T>(6.5));
     A.assemble();
 
-    std::ostringstream out;
-    A.view(out);
-    const std::string text = out.str();
+    const std::string text = captureView(A);
 
     ASSERT(printsAllEntries(A, text));
 
@@ -146,9 +156,7 @@ TEST_CASE(view_after_rebuild)
     A.setValue(0, 1, static_cast<T>(9.75));
     A.assemble();
 
-    std::ostringstream out;
-    A.view(out);
-    const std::string text = out.str();
+    const std::string text = captureView(A);
 
     ASSERT_NEAR(A.getValue(0, 1), static_cast<T>(9.75), static_cast<T>(1e-6));
     ASSERT(printsAllEntries(A, text));
