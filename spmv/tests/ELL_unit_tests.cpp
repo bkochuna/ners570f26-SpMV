@@ -147,6 +147,15 @@ TEST_CASE(ELL_viewMatrixMarketFormat) {
 	}
 }
 
+// Test suite for view test cases
+template <typename T> TEST_SUITE(ELL_testViewSuite) {
+    // Run unit test when suite is run
+	TEST(ELL_createViewFile);
+	TEST(ELL_writtenViewFile);
+	TEST(ELL_viewMatrixMarketFormat);
+}
+// ============================================================================
+
 
 // ============================================================================
 // ==== MAIN: Implemented by leahghartman
