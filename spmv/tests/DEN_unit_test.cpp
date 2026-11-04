@@ -16,14 +16,14 @@ TEST_CASE(get_and_setMatValue)
     size_t nCols = 3;
     SpMV::SparseMatrix_DEN<double> testMat1(nRows,nCols);
 
-    double testVal1 = 1.6592;
+    double testVal1 = 16592.0;
     int testRow1 = 2;
     int testCol1 = 2;
     testMat1.setValue(testRow1,testCol1,testVal1);
     ASSERT_NEAR(testMat1.getValue(testRow1,testCol1), testVal1, 1E-3);
 
-    SpMV::SparseMatrix_DEN<double> testMat2(nRows,nCols);
-    float testVal2 = 44444.44444;
+    SpMV::SparseMatrix_DEN<float> testMat2(nRows,nCols);
+    float testVal2 = 44444.0;
     int testRow2 = 0;
     int testCol2 = 1;//due to encapsulation, we have to test both at once
     testMat2.setValue(testRow2,testCol2,testVal2);
