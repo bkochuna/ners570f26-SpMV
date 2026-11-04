@@ -99,6 +99,8 @@ namespace SpMV
     {
         for (size_t j = _iter_ptr[i]; j < _iter_ptr[i + 1]; j++)
         {
+          // The row is the position in the column (j - prefix start),
+          // We then map back to the original row
             size_t orig_row = this->_row_srt_idx[j - _iter_ptr[i]];
             size_t orig_col = _col_idx[j];
             fp_type val = _value[j];
