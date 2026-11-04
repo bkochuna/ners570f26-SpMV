@@ -62,7 +62,6 @@ namespace SpMV
 	{
 		// This routine converts _buildCoeff into the CSR storage format.
 		assert(this->_state == MatrixState::building);
-		cout << "Hello from CSR assemble.";
 
 		// Useful attributes
 		size_t N = this->_nrows;
