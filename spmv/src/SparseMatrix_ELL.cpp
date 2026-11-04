@@ -1,7 +1,10 @@
 #include "SparseMatrix_ELL.hpp"
 
 #include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <stddef.h>
+
 
 using namespace std;
 
@@ -40,18 +43,16 @@ namespace SpMV
         assert(this->_state == MatrixState::assembled);
 
         size_t nrows = this->_nrows;
-        size_t maxnz_row = this->_maxnz_row;
 
         std::ofstream outfile("ELL.view");
 
-        for (size_t i=0; i<nrows*maxnz_row; i++)
+        for (size_t idx=0; idx<nrows*max_length_row; idx++)
         {
-            outfile << std:setw(10) << this->_ja[i] << ' ' << this->_vals[i] << '\n';
+            outfile << std:setw(10) << col_idx[idx] << ' ' << values[idx] << '\n';
         }
 
         outfile.close();
     }
-
 
 }
 
