@@ -23,7 +23,7 @@ namespace SpMV
 
         // Count the nonzero entries in each row. The longest row sets the padded width
         // that every row is stored with.
-        std::vector<int> rowCount(nrows, 0);
+        std::vector<size_t> rowCount(nrows, 0);
         for (const auto& [ij, val] : this->_buildCoeff)
             rowCount[ij.first]++;
         
