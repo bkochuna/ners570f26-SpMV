@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stddef.h>
 #include <string_view>
+#include <vector>
 
 using namespace std;
 
@@ -92,36 +93,73 @@ namespace SpMV
 
     // SETTERS AND GETTERS =============================================================
     template <class fp_type>
-    size_t SparseMatrix_ELL<fp_type>::getColIdx(const size_t i, const size_t slot, const size_t totalRows = 0) const
-    {
-        assert(this->_state > MatrixState::initialized);
-
-        // Access total rows from base class
-        if (totalRows == 0) {
-            size_t totalRows = this->_nrows;
-        }
-
-        // Row-major: (row * max_row_length) + slot
-        col_idx = _colidx[(i * _maxrowlength) + slot]
-
-        // Column-major: (slot * total_rows) + row
-        //col_idx = _colidx[(i * totalRows) + slot]
-        
-        return col_idx;
+    size_t SparseMatrix_ELL<fp_type>::get_nrows() const noexcept {
+        return this->_nrows;
+    }
+    
+    template <class fp_type>
+    size_t SparseMatrix_ELL<fp_type>::get_ncols() const noexcept {
+        return this->ncols;
+    }
+    
+    template <class fp_type>
+    size_t SparseMatrix_ELL<fp_type>::get_max_length_row() const noexcept {
+        return max_length_row;
     }
 
+    // Get the entire column index array
     template <class fp_type>
-    fp_type SparseMatrix_ELL<fp_type>::getValue(const size_t i, const size_t slot, const size_t totalRows = 0) const
+    const std::vector<size_t>&
+    SparseMatrix_ELL<fp_type>::get_col_idx_array() const noexcept {
+        return this->col_idx;
+    }
+    
+    // Get one column index at a given row and slot value for matrix multiplication
+    template <class fp_type>
+    size_t SparseMatrix_ELL<fp_type>::get_col_idx(const size_t i, const size_t slot, const size_t totalRows = 0) const
+    {
+        assert(this->_state > MatrixState::initialized);
+
+        // Check that the passed row index and slot index are valid ranges
+        if (i >= this->_nrows || slot >= this->max_length_row) {
+            throw std::out_of_range("Invalid row or slot index!");
+        }
+
+        // Access total rows from base class
+        // if (totalRows == 0) {
+        //     size_t totalRows = this->_nrows;
+        // }
+
+        // Row-major: (row * max_row_length) + slot
+        const size_t idx = (i * this->max_length_row) + slot;
+        //col_idx[(i * _maxrowlength) + slot]
+
+        // Column-major: (slot * total_rows) + row
+        //col_idx[(i * totalRows) + slot]
+        
+        return this->col_idx[idx];
+    }
+
+    // Get the entire values array
+    template <class fp_type>
+    const std::vector<fp_type>&
+    SparseMatrix_ELL<fp_type>::get_values_array() const noexcept {
+        return this->values;
+    }
+
+    // Get one value at a given row and slot value for matrix multiplication
+    template <class fp_type>
+    fp_type SparseMatrix_ELL<fp_type>::get_value(const size_t i, const size_t slot, const size_t totalRows = 0) const
     {
         assert(this->_state > MatrixState::initialized);
 
         // Access total rows from base class
-        if (totalRows == 0) {
-            size_t totalRows = this->_nrows;
-        }
+        // if (totalRows == 0) {
+        //     size_t totalRows = this->_nrows;
+        // }
 
         // Row-major: (row * max_row_length) + slot
-        val = _vals[(i * _maxrowlength) + slot]
+        val = values[(i * max_length_row) + slot]
 
         // Column-major: (slot * total_rows) + row
         //val = _vals[(i * totalRows) + slot]
