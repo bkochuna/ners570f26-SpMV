@@ -100,6 +100,18 @@ namespace SpMV
         return "ELL";
     }
 
+    std::vector<double> SparseMatrix_ELL<fp_type>::to_dense() const {
+        std::vector<double> dense(nrows * ncols, 0.0); // transform ell into dense format
+        for (int r = 0; r < nrows; ++r) {
+            int offset = r * max_nnz_per_row;
+            for (int k = 0; k < max_nnz_per_row; ++k) {
+                int c = col_idx[offset + k];
+                if (c == -1) continue; 
+                dense[r * ncols + c] = values[offset + k];
+            }
+        }
+        return dense;
+    }
     // I used the attributes: nrows, width = max_nnz_per_row, col_indices, and values that I expect to get from the A constructed in ELL format
     std::vector<double> SparseMatrix_ELL<fp_type>::matvec(const std::vector<double>& x) {
         
