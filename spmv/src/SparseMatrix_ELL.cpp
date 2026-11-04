@@ -180,6 +180,24 @@ namespace SpMV
         return "ELL";
     }
     // ==================================================================================
+
+    // I used the attributes: nrows, width = max_nnz_per_row, col_indices, and values that I expect to get from the A constructed in ELL format
+    std::vector<double> SparseMatrix_ELL<fp_type>::matvec(const std::vector<double>& x) {
+        
+        // declare and initialize output vector y
+        std::vector<double> y(nrows, 0.0);
+
+        // solve
+        for (size_t i = 0; i < nrows; ++i) {
+            for (size_t k = 0; k < width; ++k) {
+                const size_t p = i * width + k;
+                    y[i] += values[p] * x[col_idx[p]];
+            }
+        }  
+    
+        return y;
+    }
+
 }
 
 // Need to declare the concrete templates within the library for

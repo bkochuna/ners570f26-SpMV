@@ -54,4 +54,8 @@ namespace SpMV
     };
 }
 
+std::vector<double> matvec{
+    const std::vector<double>& x
+};
+   
 #endif
