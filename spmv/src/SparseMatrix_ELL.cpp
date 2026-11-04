@@ -72,7 +72,7 @@ namespace SpMV
             for (size_t j = 0; j < nrows; j++) {
                 const size_t idx = i * nrows + j;
                 if (values[idx] == fp_type(0)) continue;
-                this->_buildCoeff[{i, col_idx[idx]}] = values[idx];
+                this->_buildCoeff[{j, col_idx[idx]}] = values[idx];
             }
         }
         this->_numnz = this->_buildCoeff.size();
