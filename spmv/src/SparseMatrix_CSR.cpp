@@ -197,7 +197,8 @@ namespace SpMV
 			return false; // bad path, no permission, etc.
 		}
 		view(file);
-		return true;
+		file.flush();
+		return static_cast<bool>(file);
 	}
 
     template <class fp_type>
