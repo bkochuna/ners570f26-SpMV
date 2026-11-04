@@ -40,7 +40,7 @@ namespace SpMV
         // will work here. 
         // next[i] tracks how many entries of each row have been placed so far,
         // so the k-th entry of row i goes to the column-major index.
-        std::vector<int> next(nrows, 0);
+        std::vector<size_t> next(nrows, 0);
         for (const auto& [ij, val] : this->_buildCoeff) {
             const size_t i = ij.first;
             const size_t idx = next[i] * nrows + i;
