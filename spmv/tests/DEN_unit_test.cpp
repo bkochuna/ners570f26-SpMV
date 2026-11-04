@@ -87,14 +87,14 @@ TEST_CASE(largevalues)
     A.setValue(0,1,3e10);
     A.setValue(1,0,5e10);
     A.setValue(1,1,2e10);
-    A.assemble(); // The identity matrix is now assembled and ready.
+    A.assemble(); // The matrix is assembled and ready.
 
     std::vector<double> x= {1e4, 2e4};
     std::vector<double> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
     std::vector<double> xref= {7e14, 9e14};
     for (size_t i = 0; i < 2; ++i)
     {
-        ASSERT_NEAR(xnew[i], xref[i], 4e1); //esilion = 4 =10 × 2 × 2.2e-16 × 9e14
+        ASSERT_NEAR(xnew[i], xref[i], 4e0); //tolerance = 4 =10 × 2 × 2.2e-16 × 9e14
     }
     
 }
@@ -105,16 +105,19 @@ TEST_CASE(smallvalues){
     A.setValue(0,1,3e-10);
     A.setValue(1,0,5e-10);
     A.setValue(1,1,2e-10);
-    A.assemble(); // The identity matrix is now assembled and ready.
+    A.assemble(); // The matrix is now assembled and ready.
 
     std::vector<double> x= {1e-4, 2e-4};
     std::vector<double> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
     std::vector<double> xref= {7e-14, 9e-14};
     for (size_t i = 0; i < 2; ++i)
     {
-        ASSERT_NEAR(xnew[i], xref[i], 1e-20); 
+        ASSERT_NEAR(xnew[i], xref[i], 4e-28); //tolerance = 10 × 2 × 2.2e-16 x 9e-14=~4e-28 
     }
 }
+
+
+
 
 TEST_SUITE(den_matvec_suite)
 {
@@ -124,7 +127,7 @@ TEST_SUITE(den_matvec_suite)
     TEST(onebyone);
     TEST(largevalues);
     TEST(smallvalues);
-    
+
 }
 
 auto

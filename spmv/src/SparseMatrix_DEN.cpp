@@ -11,7 +11,7 @@ namespace SpMV
    template <class fp_type>
    void SparseMatrix_DEN<fp_type>::view() const
    {
-    assert(this->_state > MatrixState::initialized);
+    assert(this->_state == MatrixState::assembled);
     for (size_t i = 0; i < this->_nrows; ++i)
     {
         for (size_t j = 0; j < this->_ncols; ++j)
