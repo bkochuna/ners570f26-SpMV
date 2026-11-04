@@ -161,6 +161,10 @@ template <typename T> TEST_SUITE(accessor_suite) {
 
 // Assembly/disassembly unit tests - Hanga
 
+// This tests a nominal use case where the user assembles a
+// 5x5 sparse matrix, then explicitly disassembles it. This 
+// test also explicitly tests if the matrix values are correct
+// after assembly and disassembly.
 template <typename T>
 TEST_CASE(nominalAssembleDisassemble)
 {
@@ -235,10 +239,52 @@ TEST_CASE(nominalAssembleDisassemble)
 
     // disassemble matrix
     test_matrix.disassemble();
+    
+    // see if it disassembled properly
     ASSERT(test_matrix.getState() == SpMV::MatrixState::building);
+
+    // test if values are *still* what they should be
+    mij = 1.0;
+    for (size_t i=0; i<5; i++)
+    {
+        if (i!=3)
+        {
+            for (size_t j=0; j<n; j++)
+            {
+                // make sure nonzero values are where they should be
+                // and are what they should be
+                if (j<=i)
+                {
+                    test_mij = test_matrix.getValue(i, j);
+                    ASSERT_NEAR(mij, test_mij, static_cast<T>(1e-3));
+                    mij += static_cast<T>(1.0);
+                }
+                // also test that values that weren't explicitly set are zero
+                else
+                {
+                    test_mij = test_matrix.getValue(i, j);
+                    ASSERT_NEAR(static_cast<T>(0.0), test_mij, static_cast<T>(1e-3));
+                }
+            }
+
+        }
+        else // testing that the empty row is full of only zeros
+        {
+            for (size_t j=0; j<n; j++)
+            {
+                test_mij = test_matrix.getValue(i, j);
+                ASSERT_NEAR(static_cast<T>(0.0), test_mij, static_cast<T>(1e-3));
+            }
+        }
+    }
     // test matrix will be destroyed automatically once out of scope
 }
 
+
+// This tests a case where the user assembles a simple matrix
+// (a 2x2 identity matrix in this case), then calls setValue,
+// implictly disassembling it. In particular, we're making sure
+// the matrix remains disassembled after setValue is called.
 template <typename T>
 TEST_CASE(assembleImpliedDisassemble)
 {
@@ -265,6 +311,11 @@ TEST_CASE(assembleImpliedDisassemble)
     // test matrix will be destroyed automatically once out of scope
 }
 
+// This tests a case where the user assembles a 2x2 zero matrix.
+// In this case, we're just making sure that having an empty matrix
+// doesn't cause any exceptions during assembly and disassembly.
+// We already know the matrix state is updated correctly and that
+// calling getValue on an empty matrix element returns zero.
 template <typename T>
 TEST_CASE(emptyAssembleDisassemble)
 {
@@ -278,7 +329,7 @@ TEST_CASE(emptyAssembleDisassemble)
     
 }
 
-
+// Suite to run all the assembly test cases for a templated type.
 template <typename T>
 TEST_SUITE(assemble_suite)
 {
