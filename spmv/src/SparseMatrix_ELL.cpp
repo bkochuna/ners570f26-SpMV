@@ -35,17 +35,19 @@ namespace SpMV
     }
 
     // I used the attributes: nrows, width = max_nnz_per_row, col_indices, and values that I expect to get from the A constructed in ELL format
-    std::vetcor<double> SparseMatrix_ELL<fp_type>::matvec(const SparseMatrix_ELL& A, const std::vector<double>& x) {
+    std::vector<double> SparseMatrix_ELL<fp_type>::matvec(const std::vector<double>& x) {
+        
         // declare and initialize output vector y
-        std::vector<double> y(A.nrows, 0.0);
+        std::vector<double> y(nrows, 0.0);
 
         // solve
-        for (size_t i = 0; i < A.nrows; ++i) {
-            for (size_t k = 0; k < A.width; ++k) {
-                const size_t p = i * A.width + k;
-                y[i] += A.values[p] * x[A.col_indices[p]];
+        for (size_t i = 0; i < nrows; ++i) {
+            for (size_t k = 0; k < width; ++k) {
+                const size_t p = i * width + k;
+                    y[i] += values[p] * x[col_idx[p]];
             }
         }  
+    
         return y;
     }
 
