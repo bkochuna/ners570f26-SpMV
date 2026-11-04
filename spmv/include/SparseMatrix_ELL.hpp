@@ -18,7 +18,6 @@ namespace SpMV
 }
 
 std::vector<double> matvec{
-    const SparseMatrix_ELL& A, 
     const std::vector<double>& x
 };
    
