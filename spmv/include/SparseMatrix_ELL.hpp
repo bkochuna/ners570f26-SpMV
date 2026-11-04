@@ -29,7 +29,7 @@ namespace SpMV
             void set_values(const std::vector<fp_type>& values);
             void set_max_length_row(const size_t max_length_row);
 
-            void view(std::ostream& os) const; 
+            void view() const; 
 
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;
