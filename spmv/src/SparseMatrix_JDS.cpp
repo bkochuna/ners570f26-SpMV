@@ -184,7 +184,7 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
         assert(i < this->_nrows);
         assert(j < this->_ncols);
 
-        // If the matrix is not assembled, we can just use the base class's getValue method
+        // If the matrix is not assembled, search for the entry in _buildCoeff
         if (this->_state != MatrixState::assembled)
         {
             auto it = this->_buildCoeff.find(std::make_pair(i, j));
@@ -207,7 +207,7 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
             // If the sorted row index is greater than or equal to the number of rows in this diagonal, continue to the next diagonal
             if (sorted_row >= nrows_chunk)
             {
-                continue;
+                break;
             }
             // Calculate the index in the flattened JDS arrays for the requested entry
             const size_t idx = this->_iter_ptr[k] + sorted_row;
@@ -224,6 +224,7 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
     // Setter for the JDS matrix. Takes in inputs and stores them. - Steven
     template <class fp_type> void SparseMatrix_JDS<fp_type>::setValue(const size_t i, const size_t j, fp_type val)
     {
+        // Makes sure the requested row and column are within the bounds of the matrix
         assert(i < this->_nrows);
         assert(j < this->_ncols);
 
