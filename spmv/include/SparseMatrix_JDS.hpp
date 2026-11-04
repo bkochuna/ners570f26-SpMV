@@ -25,7 +25,7 @@ namespace SpMV
         [[nodiscard]] // Warning if the return value is not used
         fp_type getValue(const size_t i, const size_t j) const noexcept; // Get Value: Getter for the JDS matrix. Takes in inputs and returns the value at that location.
 
-        vector<fp_type> matvec(vector<fp_type> vecin, size_t nmults=1); // Matrix-_Vector Multiplication: Performs matvec given some input vector (set nmults=1 by default in case the user is lazy)
+        vector<fp_type> matvec(const vector<fp_type> x); // Matrix-_Vector Multiplication: Performs matvec given some input vector 
 
     private:
         size_t _max_row_size; // size of row with maximum number of non-zeros in matrix

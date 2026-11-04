@@ -243,11 +243,19 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
     }
 
     // matrix-vector multiplication - Hanga
+    // This function takes an input vector with a length equal to the number of columns
+    // of this matrix and multiplies it with this matrix in JDS format, returning the
+    // resulting output vector.
+    // Parameters: x (vector<fp_type>)
+    // Returns: y (vector<fp_type>)
     template <class fp_type>
-    vector<fp_type> SparseMatrix_JDS<fp_type>::matvec(vector<fp_type> vecin, size_t nmults) // NOTE: default is nmults=1 in header file
+    vector<fp_type> SparseMatrix_JDS<fp_type>::matvec(const vector<fp_type> x)
     {
         // make sure our matrix is actually ready to go
         assert(this->_state == MatrixState::assembled);
+        // make sure our input vector is the correct size
+        // i.e. its length = the number of matrix columns
+        assert(x.size() == this->_ncols);
         cout << "Matrix-vector multiplication starting..." << endl;
 
         // row and column indices, 
@@ -257,45 +265,30 @@ void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
         // output vector - initialize to be all zeros
         // in case a row of the matrix turns out to be all zeros
         // and thus gets skipped over during the matvec routine
-        vector<fp_type> vecout(this->_nrows, 0);
-
-        // local temporary copy of vecin that can be overwritten if nmults>1
-        vector<fp_type> vecin_temp = vecin;
+        vector<fp_type> y(this->_nrows, 0);
         
-        // loop through desired number of multiplications
-        for (size_t n = 0; n < nmults; n++)
+        // loop through _iter_ptr array; _max_row_size may be zero, but that's okay
+        for (size_t k = 0; k < this->_max_row_size; k++)
         {
-            // loop through _iter_ptr array; _max_row_size may be zero, but that's okay
-            for (size_t k = 0; k < this->_max_row_size; k++)
+            // get starting index of largest row
+            l_idx = this->_iter_ptr[k];
+            // get number of rows before next column
+            nrows_chunk = this->_iter_ptr[k+1] - this->_iter_ptr[k];
+            
+            // iterate over rows in this chunk of the array
+            for (size_t t = 0; t < nrows_chunk; t++)
             {
-                // get starting index of largest row
-                l_idx = this->_iter_ptr[k];
-                // get number of rows before next column
-                nrows_chunk = this->_iter_ptr[k+1] - this->_iter_ptr[k];
-                
-                // iterate over rows in this chunk of the array
-                for (size_t t = 0; t < nrows_chunk; t++)
-                {
-                    // get row index
-                    i = this->_row_srt_idx[t];
-                    // get column index
-                    j = this->_col_idx[l_idx+t];
-                    // do the multiplication
-                    vecout[i] = vecout[i] + this->_value[l_idx+t]*vecin_temp[j];
-                }
+                // get row index
+                i = this->_row_srt_idx[t];
+                // get column index
+                j = this->_col_idx[l_idx+t];
+                // do the multiplication
+                y[i] = y[i] + this->_value[l_idx+t]*x[j];
             }
-            // if we're not on the last iteration
-            if (n < nmults-1)
-            {
-                // make last output vector the new input vector
-                vecin_temp = vecout;
-                // and zero out the output vector
-                fill(vecout.begin(), vecout.end(), 0.0);
-            }        
-        }
+        }     
 
         cout << "Done!" << endl;
-        return vecout;
+        return y;
     }
 
 }
