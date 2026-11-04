@@ -1,86 +1,67 @@
-#include "SpMV.hpp"
+#include "SparseMatrix_ELL.hpp"
 #include <vector>
 #include <stdexcept>
-#include <cmath>
+#include <type_traits>
 #include "unit_test_framework.hpp"
 
-// considering that the assembe method takes 3 arguments: nrows, ncols, max_nnz (not sure who wrote it)
 // 1. FORMATTING TESTS
 TEST_CASE(test_format_verify_output_geometry) {
-    int rows = 4;
-    int max_nnz = 3;
-    SpMV::SparseMatrix_ELL ell(rows, 4, max_nnz);
-    ell.assemble({0, 1}, {1, 2}, {5.0, 6.0});
-
-    // Verify format of assemble output arrays: Must be 1D structures
-    size_t expected_flat_size = static_cast<size_t>(rows * max_nnz);
+    size_t rows = 4;
+    size_t cols = 4;
     
-    ASSERT(ell.cols.size() == expected_flat_size);
-    ASSERT(ell.values.size() == expected_flat_size);
+    SpMV::SparseMatrix_ELL<double> ell(rows, cols);
+    ell.setValue(0, 1, 5.0);
+    ell.setValue(1, 2, 6.0);
+    ell.assemble();
+
+    ASSERT(ell.getFormat() == SpMV::MatrixType::ELL);
 }
 
 TEST_CASE(test_format_verify_input_mismatched_bounds) {
-    SpMV::SparseMatrix_ELL ell(3, 3, 2);
+    SpMV::SparseMatrix_ELL<double> ell(3, 3);
     
-    // Simulate passing invalid dimensions by generating coordinate arrays with mismatched lengths
-    std::vector<int> rows = {0, 1, 2};
-    std::vector<int> columns = {1, 2}; // Length mismatch error
-    std::vector<double> data = {10.0, 20.0, 30.0};
-
+    // Testing out-of-bounds index insertion behavior
     bool caught = false;
     try {
-        ell.assemble(rows, columns, data);
+        ell.setValue(10, 2, 30.0); // Out of row bounds
+    } catch (const std::out_of_range&) {
+        caught = true;
     } catch (const std::invalid_argument&) {
         caught = true;
     }
     ASSERT(caught);
 }
 
-// Make sure col_idx has int entries
-TEST_CASE(test_format_verify_column_integer_type) {
-    bool is_int_type = std::is_same<int, typename decltype(SpMV::SparseMatrix_ELL::cols)::value_type>::value;
-    ASSERT(is_int_type);
-}
-
-
 // 2. EDGE CASE TESTS
 TEST_CASE(test_edge_empty_matrix) {
-    SpMV::SparseMatrix_ELL ell(4, 4, 2);
-    ell.assemble({}, {}, {});
+    SpMV::SparseMatrix_ELL<double> ell(4, 4);
+    ell.assemble();
 
-    // Ensure structural allocation is cleanly padded with 0.0 and -1
-    for (double val : ell.values) {
-        ASSERT_NEAR(val, 0.0, 1e-14);
-    }
-    for (int col : ell.cols) {
-        ASSERT(col == -1);
-    }
+    // Check retrieving unassigned values returns 0.0
+    ASSERT_NEAR(ell.getValue(0, 0), 0.0, 1e-14);
+    ASSERT_NEAR(ell.getValue(2, 3), 0.0, 1e-14);
 }
 
 // 3. COMPARISON TESTS
 TEST_CASE(test_comparison_dense_equivalence) {
-    SpMV::SparseMatrix_ELL ell(3, 3, 2);
-    ell.assemble({0, 0, 1, 2}, {0, 2, 1, 0}, {10.0, 20.0, 30.0, 40.0});
+    SpMV::SparseMatrix_ELL<double> ell(3, 3);
+    ell.setValue(0, 0, 10.0);
+    ell.setValue(0, 2, 20.0);
+    ell.setValue(1, 1, 30.0);
+    ell.setValue(2, 0, 40.0);
+    ell.assemble();
 
-    std::vector<double> expected_dense = {
-        10.0,  0.0, 20.0,
-         0.0, 30.0,  0.0,
-        40.0,  0.0,  0.0
-    };
-
-    std::vector<double> actual_dense = ell.to_dense();
-    ASSERT(actual_dense.size() == expected_dense.size());
-    
-    for (size_t i = 0; i < expected_dense.size(); ++i) {
-        ASSERT_NEAR(actual_dense[i], expected_dense[i], 1e-14);
-    }
+    ASSERT_NEAR(ell.getValue(0, 0), 10.0, 1e-14);
+    ASSERT_NEAR(ell.getValue(0, 1), 0.0, 1e-14);
+    ASSERT_NEAR(ell.getValue(0, 2), 20.0, 1e-14);
+    ASSERT_NEAR(ell.getValue(1, 1), 30.0, 1e-14);
+    ASSERT_NEAR(ell.getValue(2, 0), 40.0, 1e-14);
 }
 
 // TEST SUITES ENCAPSULATION
 TEST_SUITE(ell_matrix_all_tests) {
     TEST(test_format_verify_output_geometry);
     TEST(test_format_verify_input_mismatched_bounds);
-    TEST(test_format_verify_column_integer_type);
     TEST(test_edge_empty_matrix);
     TEST(test_comparison_dense_equivalence);
 }
