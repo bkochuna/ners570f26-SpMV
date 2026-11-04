@@ -21,7 +21,7 @@ namespace SpMV
         assert(this->_state == MatrixState::building);
         const size_t nrows = this->_nrows;
 
-        // Count the entries in each row. The longest row sets the padded width
+        // Count the nonzero entries in each row. The longest row sets the padded width
         // that every row is stored with.
         std::vector<int> rowCount(nrows, 0);
         for (const auto& [ij, val] : this->_buildCoeff)
