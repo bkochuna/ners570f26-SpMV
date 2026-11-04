@@ -49,21 +49,26 @@ template <typename T> TEST_CASE(test_dim) {
 // Test that the JDS matrix view displays readable information - Steven
 template <typename T> TEST_CASE(test_view)
 {
+    // Create a 3x3 JDS matrix
     SpMV::SparseMatrix_JDS<T> test(3, 3);
 
+    // Insert values into the matrix
     test.setValue(0, 0, T{1.0});
     test.setValue(0, 2, T{2.0});
     test.setValue(1, 1, T{3.0});
 
+    // Assemble the matrix to convert it into JDS format
     test.assemble();
 
     // Capture the view output in a string stream
     std::ostringstream output;
+    // Call the view method to display the matrix information
     test.view(output);
 
-    // Check that the output contains readable matrix information
+    // Store the output in a string
     std::string result = output.str();
 
+    // Check that the output contains readable matrix information
     ASSERT(result.find("JDS matrix") != std::string::npos);
     ASSERT(result.find("Dimensions: 3 x 3") != std::string::npos);
     ASSERT(result.find("Nonzeros: 3") != std::string::npos);
@@ -73,6 +78,61 @@ template <typename T> TEST_CASE(test_view)
     ASSERT(result.find("iter_ptr:") != std::string::npos);
     ASSERT(result.find("col_idx:") != std::string::npos);
     ASSERT(result.find("value:") != std::string::npos);
+
+    // Check that the output strings appear in the correct order
+    const size_t pos_matrix = result.find("JDS matrix");
+    const size_t pos_dimensions = result.find("Dimensions: 3 x 3");
+    const size_t pos_nonzeros = result.find("Nonzeros: 3");
+    const size_t pos_state = result.find("State: assembled");
+    const size_t pos_row_srt_idx = result.find("row_srt_idx");
+    const size_t pos_row_map = result.find("row_map");
+    const size_t pos_iter_ptr = result.find("iter_ptr:");
+    const size_t pos_col_idx = result.find("col_idx:");
+    const size_t pos_value = result.find("value:");
+
+    // Ensure that the positions of the strings are in the correct order
+    ASSERT(pos_matrix < pos_dimensions);
+    ASSERT(pos_dimensions < pos_nonzeros);
+    ASSERT(pos_nonzeros < pos_state);
+    ASSERT(pos_state < pos_row_srt_idx);
+    ASSERT(pos_row_srt_idx < pos_row_map);
+    ASSERT(pos_row_map < pos_iter_ptr);
+    ASSERT(pos_iter_ptr < pos_col_idx);
+    ASSERT(pos_col_idx < pos_value);
+
+    // Count occurrences of a string in the output to avoid duplicates
+    auto countOccurrences = [&](const std::string& text)
+    {
+        size_t count = 0;
+        size_t pos = 0;
+
+        // Count occurrences of the specified text in the result string
+        while ((pos = result.find(text, pos)) != std::string::npos)
+        {
+            count++;
+            pos += text.length();
+        }
+
+        return count;
+    };
+
+    // Check that each label appears exactly once
+    ASSERT(countOccurrences("JDS matrix") == 1);
+    ASSERT(countOccurrences("Dimensions:") == 1);
+    ASSERT(countOccurrences("Nonzeros:") == 1);
+    ASSERT(countOccurrences("State: assembled") == 1);
+    ASSERT(countOccurrences("row_srt_idx") == 1);
+    ASSERT(countOccurrences("row_map") == 1);
+    ASSERT(countOccurrences("iter_ptr:") == 1);
+    ASSERT(countOccurrences("col_idx:") == 1);
+    ASSERT(countOccurrences("value:") == 1);
+
+    // Check that the actual JDS data matches the input matrix
+    ASSERT(result.find("row_srt_idx (sorted to original): 0 1 2") != std::string::npos);
+    ASSERT(result.find("row_map (original to sorted): 0 1 2") != std::string::npos);
+    ASSERT(result.find("iter_ptr: 0 2 3") != std::string::npos);
+    ASSERT(result.find("col_idx: 0 1 2") != std::string::npos);
+    ASSERT(result.find("value: 1 3 2") != std::string::npos);
 }
 
 // Basic Test Suite
