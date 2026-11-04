@@ -9,6 +9,7 @@
 
 namespace
 {
+    // populate a small example matrix
     template <typename T>
     void populateMatrix(SpMV::SparseMatrix_CSR<T>& matrix)
     {
@@ -18,6 +19,7 @@ namespace
     }
 }
 
+// test that we can recover the right number of non-zero matrix entries
 template <typename T>
 TEST_CASE(csr_numnz)
 {
@@ -34,6 +36,7 @@ TEST_CASE(csr_numnz)
     ASSERT(matrix.getNumnz() == 3);
 }
 
+// test that the nrows doesn't change between initializing and assembling
 template <typename T>
 TEST_CASE(csr_nrows)
 {
@@ -44,6 +47,7 @@ TEST_CASE(csr_nrows)
     ASSERT(matrix.getNrows() == 3);
 }
 
+// test that the ncols doesn't change between initializing and assembling
 template <typename T>
 TEST_CASE(csr_ncols)
 {
@@ -54,6 +58,8 @@ TEST_CASE(csr_ncols)
     ASSERT(matrix.getNcols() == 4);
 }
 
+// test that we can access the format, and it doesn't change between
+// initializing and assembling
 template <typename T>
 TEST_CASE(csr_format)
 {
@@ -66,6 +72,7 @@ TEST_CASE(csr_format)
     ASSERT(matrix.printFormat() == "CSR");
 }
 
+// test that at each stage, matrix state is accessible and is correct
 template <typename T>
 TEST_CASE(csr_state)
 {
@@ -82,6 +89,8 @@ TEST_CASE(csr_state)
     ASSERT(matrix.getState() == SpMV::MatrixState::building);
 }
 
+// test that changing one value in the matrix leaves all other entries and
+// metadata unchanged
 template <typename T>
 TEST_CASE(csr_single_value)
 {
@@ -93,7 +102,6 @@ TEST_CASE(csr_single_value)
     matrix.setValue(0, 0, static_cast<T>(10.5));
     ASSERT_NEAR(matrix.getValue(0, 0), static_cast<T>(10.5), epsilon);
 
-    // Updating an existing entry must preserve other entries and metadata.
     ASSERT_NEAR(matrix.getValue(0, 3), static_cast<T>(-4.0), epsilon);
     ASSERT_NEAR(matrix.getValue(2, 1), static_cast<T>(6.25), epsilon);
     ASSERT(matrix.getNumnz() == 3);
@@ -105,6 +113,8 @@ TEST_CASE(csr_single_value)
     ASSERT_NEAR(matrix.getValue(0, 0), static_cast<T>(10.5), epsilon);
 }
 
+// test that changing multiple values in the matrix leaves all entries and
+// metadata unchanged
 template <typename T>
 TEST_CASE(csr_multiple_values)
 {
@@ -149,6 +159,7 @@ TEST_CASE(csr_multiple_values)
     ASSERT(matrix.getNumnz() == 3);
 }
 
+// build the test suite
 template <typename T>
 TEST_SUITE(csr_accessor_suite)
 {
