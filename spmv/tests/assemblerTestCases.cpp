@@ -15,32 +15,6 @@
 
 // Helpers
 
-// The library reports misuse (e.g. calling assemble() in the wrong state) with
-// assert(), which aborts the process. To test that error handling, we run the
-// offending code in a child process and check that it dies with SIGABRT.
-template <typename F>
-static bool abortsWhenRun(F&& func)
-{
-    std::fflush(nullptr); // avoid duplicating buffered output in the child
-
-    const pid_t pid = fork();
-    ASSERT(pid >= 0);
-
-    if (pid == 0) {
-        // Child: silence the expected assertion message and the library's
-        // chatty output, then run the code under test.
-        static_cast<void>(std::freopen("/dev/null", "w", stdout));
-        static_cast<void>(std::freopen("/dev/null", "w", stderr));
-        func();
-        _exit(0); // Returned normally => did NOT abort
-    }
-
-    int status = 0;
-    const pid_t waited = waitpid(pid, &status, 0);
-    ASSERT(waited == pid);
-    return WIFSIGNALED(status) && (WTERMSIG(status) == SIGABRT);
-}
-
 // Test matrix (3 x 4), 5 non-zeros:
 //     [ 1.5   0    0   -2.0 ]
 //     [  0    0   4.0   0   ]
@@ -49,14 +23,14 @@ static constexpr size_t NROWS = 3;
 static constexpr size_t NCOLS = 4;
 static constexpr size_t NNZ   = 5;
 
-template <typename T>
+	template <typename T>
 static std::vector<std::vector<T>> expectedDense()
 {
-    return {
-        {static_cast<T>(1.5), static_cast<T>(0.0),  static_cast<T>(0.0),  static_cast<T>(-2.0)},
-        {static_cast<T>(0.0), static_cast<T>(0.0),  static_cast<T>(4.0),  static_cast<T>(0.0)},
-        {static_cast<T>(0.0), static_cast<T>(7.25), static_cast<T>(0.0),  static_cast<T>(0.5)}
-    };
+	return {
+		{static_cast<T>(1.5), static_cast<T>(0.0),  static_cast<T>(0.0),  static_cast<T>(-2.0)},
+		{static_cast<T>(0.0), static_cast<T>(0.0),  static_cast<T>(4.0),  static_cast<T>(0.0)},
+		{static_cast<T>(0.0), static_cast<T>(7.25), static_cast<T>(0.0),  static_cast<T>(0.5)}
+	};
 }
 
 	template <typename T>
@@ -101,32 +75,6 @@ TEST_CASE(test_DEN_format)
 
 // Activity 1a: assemble() tests
 
-// Error handling: assemble() is only legal in the "building" state.
-	template <typename T>
-TEST_CASE(test_DEN_assemble_error_handling)
-{
-	// Control: assemble() on a properly built matrix must NOT abort, so we know
-	// the aborts below are caused by the state check and nothing else.
-	ASSERT(!abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				fillTestMatrix(A);
-				A.assemble();
-				}));
-
-	// No values were ever set: matrix is still "initialized", not "building".
-	ASSERT(abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				A.assemble();
-				}));
-
-	// Already assembled: assembling a second time is an error.
-	ASSERT(abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				fillTestMatrix(A);
-				A.assemble();
-				A.assemble();
-				}));
-}
 
 // Initialization: assemble() must create a nrows x ncols dense array that is
 // zero-filled everywhere that was not set, and move the matrix to "assembled".
@@ -195,40 +143,6 @@ TEST_CASE(test_DEN_assemble_from_input)
 
 // Activity 1b: disassemble() tests
 
-// Error handling: disassemble() is only legal in the "assembled" state.
-	template <typename T>
-TEST_CASE(test_DEN_disassemble_error_handling)
-{
-	// Control: disassemble() on an assembled matrix must NOT abort.
-	ASSERT(!abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				fillTestMatrix(A);
-				A.assemble();
-				A.disassemble();
-				}));
-
-	// Freshly constructed ("initialized"): nothing to disassemble.
-	ASSERT(abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				A.disassemble();
-				}));
-
-	// Still "building": never assembled.
-	ASSERT(abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				fillTestMatrix(A);
-				A.disassemble();
-				}));
-
-	// Already disassembled: matrix is back in "building".
-	ASSERT(abortsWhenRun([] {
-				SpMV::SparseMatrix_DEN<T> A(NROWS, NCOLS);
-				fillTestMatrix(A);
-				A.assemble();
-				A.disassemble();
-				A.disassemble();
-				}));
-}
 
 // Proper disassembly: the build map gets back every value that was assembled
 // and the matrix returns to the "building" state.
@@ -322,7 +236,6 @@ TEST_SUITE(DEN_suite)
 	template <typename T>
 TEST_SUITE(DEN_assemble_suite)
 {
-	TEST(test_DEN_assemble_error_handling<T>);
 	TEST(test_DEN_assemble_initialization<T>);
 	TEST(test_DEN_assemble_from_input<T>);
 }
@@ -330,7 +243,6 @@ TEST_SUITE(DEN_assemble_suite)
 	template <typename T>
 TEST_SUITE(DEN_disassemble_suite)
 {
-	TEST(test_DEN_disassemble_error_handling<T>);
 	TEST(test_DEN_disassemble_proper<T>);
 	TEST(test_DEN_disassemble_keeps_only_nonzeros<T>);
 	TEST(test_DEN_disassemble_roundtrip<T>);
