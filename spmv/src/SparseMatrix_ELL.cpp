@@ -35,17 +35,17 @@ namespace SpMV
     }
 
     std::vector<double> SparseMatrix_ELL<fp_type>::to_dense() const {
-        std::vector<double> dense(A.nrows * A.ncols, 0.0); // transform ell into dense format
+        std::vector<double> dense(nrows * ncols, 0.0); // transform ell into dense format
         for (int r = 0; r < nrows; ++r) {
-            int offset = r * A.max_nnz_per_row;
-            for (int k = 0; k < A.max_nnz_per_row; ++k) {
-                int c = A.col_idx[offset + k];
+            int offset = r * max_nnz_per_row;
+            for (int k = 0; k < max_nnz_per_row; ++k) {
+                int c = col_idx[offset + k];
                 if (c == -1) continue; 
-                dense[r * A.ncols + c] = A.values[offset + k];
+                dense[r * ncols + c] = values[offset + k];
             }
         }
         return dense;
-}
+    }
 }
 
 // Need to declare the concrete templates within the library for
