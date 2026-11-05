@@ -12,8 +12,9 @@ namespace SpMV
     {
         public:
             SparseMatrix_DEN(const size_t nrows, const size_t ncols);
-            void assemble();
+            void assemble() override;
             void disassemble();
+            void matvec(const std::vector<fp_type>& inputVec, std::vector<fp_type>& outputVec) const;
 
             std::vector<std::vector<fp_type>> _a;
             MatrixType       getFormat() const noexcept override;
