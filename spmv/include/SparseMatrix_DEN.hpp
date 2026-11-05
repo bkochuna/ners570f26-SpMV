@@ -21,6 +21,9 @@ namespace SpMV
             void disassemble();
             void matvec(const std::vector<fp_type>& inputVec, std::vector<fp_type>& outputVec) const;
 
+            // Accessors
+            [[nodiscard]] fp_type getValue(const size_t i, const size_t j) const noexcept override;
+
             std::vector<std::vector<fp_type>> _a;
            
            
