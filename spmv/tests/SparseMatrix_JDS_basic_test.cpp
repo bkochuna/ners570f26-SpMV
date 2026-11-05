@@ -74,7 +74,7 @@ template <typename T> TEST_CASE(test_view)
     ASSERT(result.find("Nonzeros: 3") != std::string::npos);
     ASSERT(result.find("State: assembled") != std::string::npos);
     ASSERT(result.find("row_srt_idx") != std::string::npos);
-    ASSERT(result.find("row_map") != std::string::npos);
+    ASSERT(result.find("row_map") == std::string::npos);
     ASSERT(result.find("iter_ptr:") != std::string::npos);
     ASSERT(result.find("col_idx:") != std::string::npos);
     ASSERT(result.find("value:") != std::string::npos);
@@ -85,7 +85,6 @@ template <typename T> TEST_CASE(test_view)
     const size_t pos_nonzeros = result.find("Nonzeros: 3");
     const size_t pos_state = result.find("State: assembled");
     const size_t pos_row_srt_idx = result.find("row_srt_idx");
-    const size_t pos_row_map = result.find("row_map");
     const size_t pos_iter_ptr = result.find("iter_ptr:");
     const size_t pos_col_idx = result.find("col_idx:");
     const size_t pos_value = result.find("value:");
@@ -95,8 +94,7 @@ template <typename T> TEST_CASE(test_view)
     ASSERT(pos_dimensions < pos_nonzeros);
     ASSERT(pos_nonzeros < pos_state);
     ASSERT(pos_state < pos_row_srt_idx);
-    ASSERT(pos_row_srt_idx < pos_row_map);
-    ASSERT(pos_row_map < pos_iter_ptr);
+    ASSERT(pos_row_srt_idx < pos_iter_ptr);
     ASSERT(pos_iter_ptr < pos_col_idx);
     ASSERT(pos_col_idx < pos_value);
 
@@ -122,17 +120,16 @@ template <typename T> TEST_CASE(test_view)
     ASSERT(countOccurrences("Nonzeros:") == 1);
     ASSERT(countOccurrences("State: assembled") == 1);
     ASSERT(countOccurrences("row_srt_idx") == 1);
-    ASSERT(countOccurrences("row_map") == 1);
+    ASSERT(countOccurrences("row_map") == 0);
     ASSERT(countOccurrences("iter_ptr:") == 1);
     ASSERT(countOccurrences("col_idx:") == 1);
     ASSERT(countOccurrences("value:") == 1);
 
     // Check that the actual JDS data matches the input matrix
     ASSERT(result.find("row_srt_idx (sorted to original): 0 1 2") != std::string::npos);
-    ASSERT(result.find("row_map (original to sorted): 0 1 2") != std::string::npos);
-    ASSERT(result.find("iter_ptr: 0 2 3") != std::string::npos);
-    ASSERT(result.find("col_idx: 0 1 2") != std::string::npos);
-    ASSERT(result.find("value: 1 3 2") != std::string::npos);
+    ASSERT(result.find("iter_ptr: (jagged diagonal offsets) 0 2 3") != std::string::npos);
+    ASSERT(result.find("col_idx: (column indices of stored values) 0 1 2") != std::string::npos);
+    ASSERT(result.find("value: (nonzero values in jagged diagonal order) 1 3 2") != std::string::npos);
 }
 
 // Basic Test Suite
@@ -399,6 +396,89 @@ TEST_SUITE(assemble_suite)
 }
 
 
+// Matrix-vector multiplication unit tests - Shuyi
+// Check multiplication when row lengths differ.
+template <typename T>
+TEST_CASE(matvec_uneven_rows)
+{
+    SpMV::SparseMatrix_JDS<T> matrix(3, 3);
+
+    // A = [1 0 2]
+    //     [0 3 0]
+    //     [4 5 6]
+    // Insert only the nonzero entries.
+    matrix.setValue(0, 0, T{1});
+    matrix.setValue(0, 2, T{2});
+    matrix.setValue(1, 1, T{3});
+    matrix.setValue(2, 0, T{4});
+    matrix.setValue(2, 1, T{5});
+    matrix.setValue(2, 2, T{6});
+
+    // Convert the construction data into JDS storage.
+    matrix.assemble();
+
+    // Input vector x and the independently computed expected product A*x.
+    const std::vector<T> input = {T{1}, T{2}, T{3}};
+    const std::vector<T> expected = {T{7}, T{6}, T{32}};
+
+    // Compute A*x using the assembled JDS matrix.
+    const std::vector<T> actual = matrix.matvec(input);
+
+    // Check the length before accessing output entries.
+    ASSERT(actual.size() == expected.size());
+
+    // Match the absolute tolerance used by the other JDS tests.
+    const T tolerance = static_cast<T>(1e-3);
+
+    // Check results in the original matrix row order.
+    for (std::size_t row = 0; row < expected.size(); ++row)
+    {
+        ASSERT_NEAR(actual[row], expected[row], tolerance);
+    }
+}
+
+// Check that an empty row produces a zero result.
+template <typename T>
+TEST_CASE(matvec_empty_row)
+{
+    SpMV::SparseMatrix_JDS<T> matrix(3, 3);
+
+    // A = [1 0 2]
+    //     [0 0 0]
+    //     [4 5 6]
+    // Leave row 1 empty.
+    matrix.setValue(0, 0, T{1});
+    matrix.setValue(0, 2, T{2});
+    matrix.setValue(2, 0, T{4});
+    matrix.setValue(2, 1, T{5});
+    matrix.setValue(2, 2, T{6});
+
+    matrix.assemble();
+
+    // Input vector x and the independently computed expected product A*x.
+    const std::vector<T> input = {T{1}, T{2}, T{3}};
+    const std::vector<T> expected = {T{7}, T{0}, T{32}};
+    const std::vector<T> actual = matrix.matvec(input);
+
+    ASSERT(actual.size() == expected.size());
+
+    // Match the absolute tolerance used by the other JDS tests.
+    const T tolerance = static_cast<T>(1e-3);
+
+    for (std::size_t row = 0; row < expected.size(); ++row)
+    {
+        ASSERT_NEAR(actual[row], expected[row], tolerance);
+    }
+}
+
+// Run both cases with the selected floating-point type.
+template <typename T>
+TEST_SUITE(jds_matvec_suite)
+{
+    TEST(matvec_uneven_rows<T>);
+    TEST(matvec_empty_row<T>);
+}
+
 auto main() -> int {
   RUN_SUITE(basic_suite<float>);
   RUN_SUITE(basic_suite<double>);
@@ -406,5 +486,7 @@ auto main() -> int {
   RUN_SUITE(accessor_suite<double>);
   RUN_SUITE(assemble_suite<float>);
   RUN_SUITE(assemble_suite<double>);
+  RUN_SUITE(jds_matvec_suite<float>);
+  RUN_SUITE(jds_matvec_suite<double>);
   return 0;
 }

@@ -5,6 +5,7 @@
 #include <numeric>
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 using namespace std;
 namespace SpMV
@@ -116,48 +117,41 @@ namespace SpMV
     this->_state = MatrixState::building;
     }
 // Display the matrix information without modifying it.
+// Unassembled matrices raise an error before anything is written to out.
     template <class fp_type>
-void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
-{
-    assert(this->_state == MatrixState::initialized ||
-           this->_state == MatrixState::building ||
-           this->_state == MatrixState::assembled);
-
-    out << "JDS matrix\n"
-        << "Dimensions: " << this->_nrows << " x " << this->_ncols << '\n'
-        << "Nonzeros: " << this->_numnz << '\n';
-
-    if (this->_state != MatrixState::assembled)
+    void SparseMatrix_JDS<fp_type>::view(std::ostream& out) const
     {
-        out << "State: "
-            << (this->_state == MatrixState::building ? "building" : "initialized")
-            << "\nJDS storage is not assembled.\n";
-        return;
-    }
+        // Require assembled storage in both debug and release builds.
+        if (this->_state != MatrixState::assembled)
+        {
+            throw std::logic_error("JDS view requires an assembled matrix.");
+        }
+        // Print the matrix metadata before the JDS storage arrays.
+        out << "JDS matrix\n"
+            << "Dimensions: " << this->_nrows << " x " << this->_ncols << '\n'
+            << "Nonzeros: " << this->_numnz << '\n'
+            << "State: assembled\n";
 
-    out << "State: assembled\n";
+        // Map each sorted storage row back to its original matrix row.
+        out << "row_srt_idx (sorted to original):";
+        for (const auto index : this->_row_srt_idx)
+            out << ' ' << index;
+        out << '\n';
 
-    out << "row_srt_idx (sorted to original):";
-    for (const auto index : this->_row_srt_idx)
-        out << ' ' << index;
-    out << '\n';
-
-    out << "row_map (original to sorted):";
-    for (const auto index : this->_row_map)
-        out << ' ' << index;
-    out << '\n';
-
-    out << "iter_ptr:";
+    // Mark the boundaries of the jagged diagonals in the flattened arrays.
+    out << "iter_ptr: (jagged diagonal offsets)";
     for (const auto index : this->_iter_ptr)
         out << ' ' << index;
     out << '\n';
 
-    out << "col_idx:";
+    // Give the original column index of each stored matrix value.
+    out << "col_idx: (column indices of stored values)";
     for (const auto index : this->_col_idx)
         out << ' ' << index;
     out << '\n';
 
-    out << "value:";
+    // List the matrix values in jagged diagonal storage order.
+    out << "value: (nonzero values in jagged diagonal order)";
     for (const auto entry : this->_value)
         out << ' ' << entry;
     out << '\n';

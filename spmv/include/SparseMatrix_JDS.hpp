@@ -15,7 +15,9 @@ namespace SpMV
         SparseMatrix_JDS(const size_t nrows, const size_t ncols);
         void assemble(); // Assembly: takes the matrix in its original format and assembles it into the JDS storage format
         void disassemble(); // Disassembly: takes the matrix in the JDS storage format and returns it back to original format
-        void view(std::ostream& out = std::cout) const; // View: displays matrix in the JDS storage format arrays along with some other matrix attributes (dimensions,number of nonzeros)
+        // Display matrix metadata and the assembled JDS storage arrays.
+        // Throws std::logic_error before output if the matrix is not assembled.
+        void view(std::ostream& out = std::cout) const;
 
         MatrixType getFormat() const noexcept override; // Get Format: Returns the matrix storage type we are using
         std::string_view printFormat() const noexcept override; // Print format: prints the matrix storage type format as a string
