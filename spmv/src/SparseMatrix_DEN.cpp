@@ -18,6 +18,7 @@ namespace SpMV
     }
 
     template <class fp_type>
+    // Requires: state == building (at least one setValue call).
     void SparseMatrix_DEN<fp_type>::assemble()
     {
         cout << "Hello from DEN assemble" << endl;
