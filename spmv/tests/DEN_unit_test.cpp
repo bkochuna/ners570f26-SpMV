@@ -130,11 +130,29 @@ TEST_SUITE(den_matvec_suite)
 
 }
 
-auto
-main() -> int
+
+TEST_CASE(test_DEN_class)
 {
-  // Run the unit tests. If a test fails, the program will print failure info
-  // and return 1.
-  RUN_SUITE(den_matvec_suite);
-  return 0; 
+    SpMV::SparseMatrix_DEN<double> A(2, 3);
+
+    // Verify the number of rows and columns.
+    ASSERT(A.getNrows() == 2);
+    ASSERT(A.getNcols() == 3);
+
+    // Verify the initial matrix state.
+    ASSERT(A.getState() == SpMV::MatrixState::initialized);
+}
+
+TEST_SUITE(DEN_suite)
+{
+    TEST(test_DEN_class);
+}
+
+
+
+auto main() -> int
+{
+    RUN_SUITE(DEN_suite);  // constructor and initial state
+    RUN_SUITE(den_matvec_suite); // matvec tests
+    return 0;
 }

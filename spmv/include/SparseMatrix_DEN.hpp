@@ -3,6 +3,8 @@
 
 #include "SparseMatrix.hpp"
 
+#include <vector> // std::vector
+
 namespace SpMV
 {
     template <class fp_type>
@@ -15,6 +17,11 @@ namespace SpMV
             MatrixType       getFormat() const noexcept override;
             std::string_view printFormat() const noexcept override;
             void view() const;
+            void disassemble();
+
+            std::vector<std::vector<fp_type>> _a;
+           
+           
     };
 }
 
