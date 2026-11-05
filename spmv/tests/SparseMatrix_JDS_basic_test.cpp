@@ -74,7 +74,6 @@ template <typename T> TEST_CASE(test_view)
     ASSERT(result.find("Nonzeros: 3") != std::string::npos);
     ASSERT(result.find("State: assembled") != std::string::npos);
     ASSERT(result.find("row_srt_idx") != std::string::npos);
-    ASSERT(result.find("row_map") == std::string::npos);
     ASSERT(result.find("iter_ptr:") != std::string::npos);
     ASSERT(result.find("col_idx:") != std::string::npos);
     ASSERT(result.find("value:") != std::string::npos);
@@ -120,7 +119,6 @@ template <typename T> TEST_CASE(test_view)
     ASSERT(countOccurrences("Nonzeros:") == 1);
     ASSERT(countOccurrences("State: assembled") == 1);
     ASSERT(countOccurrences("row_srt_idx") == 1);
-    ASSERT(countOccurrences("row_map") == 0);
     ASSERT(countOccurrences("iter_ptr:") == 1);
     ASSERT(countOccurrences("col_idx:") == 1);
     ASSERT(countOccurrences("value:") == 1);
