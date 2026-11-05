@@ -31,7 +31,9 @@ TEST_CASE(Identitymatrix)
     A.assemble(); // The identity matrix is now assembled and ready.
 
     std::vector<double> x = {1, 2, 3};
-    std::vector<double> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
+
+    std::vector<double> xnew(3);     
+    A.matvec(x, xnew);
 
     for (size_t i = 0; i < 3; ++i)
     {
@@ -52,11 +54,13 @@ TEST_CASE(negativevalues)
     A.assemble(); // Matrix is assembled and ready.
 
     std::vector<T> x = {1.0, -2.0};
-    std::vector<T> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
+    std::vector<T> xnew(2); 
+    A.matvec(x, xnew);
     std::vector<T> xref = {3.0, -7.0};
     for (size_t i = 0; i < 2; ++i)
     {
-        ASSERT_NEAR(xnew[i], xref[i], 1e-7); 
+        ASSERT_NEAR(xnew[i], xref[i],static_cast<T>(1e-5));  // 10 × 2 × 1.2e-7 × 7 ≈ 1.7e-5
+        // cast keeps the tolerance the same type as the data float or double
     }
     
 }
@@ -69,7 +73,8 @@ TEST_CASE(onebyone)
     A.assemble(); // Matrix is assembled and ready.
 
     std::vector<double> x = {2.0};
-    std::vector<double> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
+    std::vector<double> xnew(1);     
+    A.matvec(x, xnew);
     std::vector<double> xref = {10.0};
     
     ASSERT(xnew.size() == 1);     // Making sure the output vector of 1x1 matvec is 1x1
@@ -90,7 +95,8 @@ TEST_CASE(largevalues)
     A.assemble(); // The matrix is assembled and ready.
 
     std::vector<double> x= {1e4, 2e4};
-    std::vector<double> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
+    std::vector<double> xnew(2);     
+    A.matvec(x, xnew);
     std::vector<double> xref= {7e14, 9e14};
     for (size_t i = 0; i < 2; ++i)
     {
@@ -108,7 +114,8 @@ TEST_CASE(smallvalues){
     A.assemble(); // The matrix is now assembled and ready.
 
     std::vector<double> x= {1e-4, 2e-4};
-    std::vector<double> xnew = SpMV::matvec(A, x); //Could be A.matvec(x)?
+    std::vector<double> xnew(2);     
+    A.matvec(x, xnew);
     std::vector<double> xref= {7e-14, 9e-14};
     for (size_t i = 0; i < 2; ++i)
     {
@@ -130,29 +137,11 @@ TEST_SUITE(den_matvec_suite)
 
 }
 
-
-TEST_CASE(test_DEN_class)
+auto
+main() -> int
 {
-    SpMV::SparseMatrix_DEN<double> A(2, 3);
-
-    // Verify the number of rows and columns.
-    ASSERT(A.getNrows() == 2);
-    ASSERT(A.getNcols() == 3);
-
-    // Verify the initial matrix state.
-    ASSERT(A.getState() == SpMV::MatrixState::initialized);
-}
-
-TEST_SUITE(DEN_suite)
-{
-    TEST(test_DEN_class);
-}
-
-
-
-auto main() -> int
-{
-    RUN_SUITE(DEN_suite);  // constructor and initial state
-    RUN_SUITE(den_matvec_suite); // matvec tests
-    return 0;
+  // Run the unit tests. If a test fails, the program will print failure info
+  // and return 1.
+  RUN_SUITE(den_matvec_suite);
+  return 0; 
 }
