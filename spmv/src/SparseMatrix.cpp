@@ -1,3 +1,5 @@
+// First change to to try git commit.
+
 #include "SparseMatrix.hpp"
 
 #include <iostream>
@@ -62,3 +64,4 @@ fp_type SparseMatrix<fp_type>::getValue(const size_t i, const size_t j) const no
 // use in code that links to libspmv
 template class SpMV::SparseMatrix<float>;
 template class SpMV::SparseMatrix<double>;
+
