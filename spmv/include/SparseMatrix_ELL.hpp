@@ -1,6 +1,10 @@
 #ifndef __SPMV_SparseMatrix_ELL__
 #define __SPMV_SparseMatrix_ELL__
 
+#include <vector>
+#include <cstddef>
+#include <string_view>
+#include <iosfwd>
 #include "SparseMatrix.hpp"
 #include <vector>
 #include <cstddef>

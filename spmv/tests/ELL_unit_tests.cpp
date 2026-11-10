@@ -1,7 +1,7 @@
 #include "SpMV.hpp"
 #include "SparseMatrix.hpp"
 #include "SparseMatrix_ELL.hpp"
-
+#include <stdexcept> 
 #include <cstddef>
 #include <vector>
 #include <fstream> // Library used in view test cases
@@ -128,6 +128,152 @@ template <typename T> TEST_SUITE(basic_suite) {
     TEST(test_initial_storage_empty<T>);
 }
 
+// Setters and Getters unit test 
+//------------------------------------------------------------------------------------------------------------------
+// test case for col_idx setter
+template <typename T> TEST_CASE(compare_get_col_idx_array) 
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+
+  ell.setValue(0, 0, T(1));
+  ell.setValue(0, 1, T(2));
+  ell.setValue(0, 2, T(3));
+  ell.setValue(1, 1, T(5));
+  ell.setValue(2, 0, T(7));
+  ell.setValue(2, 2, T(9));
+  ell.assemble();
+
+  std::vector<size_t> const col_idx = {0,1,0,1,0,2,2,0,0};
+  ASSERT(ell.get_col_idx_array() == col_idx);
+}
+
+// test case for get_values setter
+template <typename T> TEST_CASE(compare_get_values_array)
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+  
+  ell.setValue(0, 0, T(1));
+  ell.setValue(0, 1, T(2));
+  ell.setValue(0, 2, T(3));
+  ell.setValue(1, 1, T(5));
+  ell.setValue(2, 0, T(7));
+  ell.setValue(2, 2, T(9));
+  ell.assemble();
+
+  std::vector<T> const values = {1,5,7,2,0,9,3,0,0};
+  std::vector<T> const& values_ell = ell.get_values_array()
+  ASSERT(values_ell.size() == values.size());
+  for (size_t i = 0; i<values.size(); i++){
+    ASSERT_NEAR(values_ell[i], values[i], 1e-3);
+  }
+}
+
+// test case for max_length_row setter
+template <typename T> TEST_CASE(compare_get_col_idx)
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+  
+  ell.setValue(0, 0, T(1));
+  ell.setValue(0, 1, T(2));
+  ell.setValue(0, 2, T(3));
+  ell.setValue(1, 1, T(5));
+  ell.setValue(2, 0, T(7));
+  ell.setValue(2, 2, T(9));
+  ell.assemble();
+
+  size_t const nrow = ell.get_nrows();
+  ASSERT(ell.get_col_idx(0,0,nrow) == 0); 
+  ASSERT(ell.get_col_idx(0,1,nrow) == 1);
+  ASSERT(ell.get_col_idx(0,1,nrow) == 2);
+  ASSERT(ell.get_col_idx(1,0,nrow) == 1);
+  ASSERT(ell.get_col_idx(2,0,nrow) == 0);
+  ASSERT(ell.get_col_idx(2,1,nrow) == 2);
+
+}
+
+//override test case for col_idx
+template <typename T> TEST_CASE(compare_get_value)
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+
+  ell.setValue(0, 0, T(1));
+  ell.setValue(0, 1, T(2));
+  ell.setValue(0, 2, T(3));
+  ell.setValue(1, 1, T(5));
+  ell.setValue(2, 0, T(7));
+  ell.setValue(2, 2, T(9));
+  ell.assemble();
+
+  size_t const nrow = ell.get_nrows();
+  ASSERT_NEAR(ell.get_value(0,0,nrow), T(1), 1e-3); 
+  ASSERT_NEAR(ell.get_value(0,1,nrow), T(2), 1e-3);
+  ASSERT_NEAR(ell.get_value(0,1,nrow), T(2), 1e-3);
+  ASSERT_NEAR(ell.get_value(1,0,nrow), T(5), 1e-3);
+  ASSERT_NEAR(ell.get_value(2,0,nrow), T(7), 1e-3);
+  ASSERT_NEAR(ell.get_value(2,1,nrow), T(9), 1e-3);
+}
+
+// override test case for values
+template <typename T> TEST_CASE(compare_get_max_length_row)
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+
+  ell.setValue(0, 0, T(1));
+  ell.setValue(0, 1, T(2));
+  ell.setValue(0, 2, T(3));
+  ell.setValue(1, 1, T(5));
+  ell.setValue(2, 0, T(7));
+  ell.setValue(2, 2, T(9));
+  ell.assemble();
+
+  ASSERT(ell.get_max_length_row() == 3);
+}
+
+template <typename T> TEST_CASE(max_length_row_override)
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+  ASSERT(ell.get_max_length_row() == 0);
+
+  ell.set_max_length_row(3);
+  ASSERT(ell.get_max_length_row() == 3);
+}
+
+
+// edge case when max_length_row is higher than the number of rows of the matrix
+template <typename T> TEST_CASE(max_length_edge_case)
+{
+  SpMV::SparseMatrix_ELL<T> ell(3,3);
+  size_t const max_length_row_invalid = 10;
+  size_t error = 0;
+  
+  try {ell.set_max_length_row(max_length_row_invalid);} 
+  catch (const std::invalid_argument& e){error = 1;}
+  ASSERT(error == 1); 
+  ASSERT(ell.get_max_length_row() == 0);
+}
+
+// test suite for the setters
+template <typename T> TEST_SUITE(test_getters_suite) 
+{
+  TEST(compare_get_col_idx_array<T>);
+  TEST(compare_get_values_array<T>);
+  TEST(compare_get_col_idx<T>);
+  TEST(compare_get_value<T>);
+  TEST(compare_get_max_length_row<T>);  
+}
+
+// test suite for the override
+template <typename T> TEST_SUITE(override_suite) 
+{
+  TEST(max_length_row_override<T>);  
+}
+
+//test suite for edge cases
+template <typename T> TEST_SUITE(edge_case) 
+{
+  TEST(max_length_edge_case<T>); 
+}
+
 // NOTE: we can add everyone else's tests above this main definition, then call
 // each suite inside the below main function.
 
@@ -233,6 +379,10 @@ auto main() -> int {
     RUN_SUITE(basic_suite<double>);
     RUN_SUITE(ell_assemble_tests);
 
+    // Run all unit tests for setters and getters
+    RUN_SUITE(test_getters_suite<float>);
+    RUN_SUITE(override_suite<float>);
+    RUN_SUITE(edge_case<float>); 
     return 0;
 }
 
